@@ -8,7 +8,7 @@ syntax Stmt ::=	"CREATE DATABASE" Id ";"
 			|	"CREATE TABLE" Id "(" Attributes ")" ";"
 			|	"ALTER TABLE" Id AddAttributes ";"
 			|	"ALTER TABLE" Id DropAttributes ";"
-	//Da verificare
+
 			|	"ALTER TABLE" Id RenameTable ";"
 			|	"ALTER TABLE" Id RenameColumnAttributes ";"
 			|	"DROP TABLE" Tables ";"
@@ -41,13 +41,6 @@ syntax RenameColumnAttributes ::= List{RenameColumnAttribute,","}
 
 syntax Tables ::= 	List{Id,","}
 syntax RenameTable ::=	"RENAME TO" Id
-
-//PROVA: l'idea è di avere un comando tipo: ALTER TABLE AlterCommand Id
-syntax AlterCommand ::=	"ADD"
-					|	"ADD COLUMN"
-					|	"DROP COLUMN"
-					|	"RENAME TO"
-					|	"RENAME COLUMN" Id "TO" Id// e questo??
 
 //syntax OpCodes ::= "ADD" Id | "ADD COLUMN" Id | "DROP COLUMN" Id | "RENAME TO" Id | "RENAME COLUMN" Id "TO" Id
 //syntax OpCodess ::= List{OpCodes,","}
@@ -99,7 +92,7 @@ rule <k> ADD SCHEMA N:Id ( X:Id T:Type , A:Attributes => A) ; ... </k>
 //se gli attributi sono finiti consuma il comando( lo rimpiazza con .K cioè il comando vuoto di tipo K )
 rule <k> ADD SCHEMA N:Id ( .Attributes ) ; => .K ... </k>
 
-// ------ ADD o ADD COLUMN  ------- //
+// ------ ADD or ADD COLUMN  ------- //
 //aggiunge uno o più attributi alla tabella
 rule <k> ALTER TABLE N:Id ( Add X:Id T:Type , A:AddAttributes => A ); ... </k>
 	<table-name> SetItem(N) </table-name>
@@ -110,15 +103,36 @@ rule <k> ( ALTER TABLE N:Id Add X:Id T:Type ; ) => .K ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map => M[T / X] </schema>
 
-// ------ DROP o DROP COLUMNS ------- //
+// ------------------------------------- Ho modificato da qua ------------------------------------------- //   DA ELIMINARE??
+
+/* le due precedenti regole aggiungono la colonna con solo add ma postgresql accetta anche add column
+rule <k> ALTER TABLE N:Id ( ADD COLUMN X:Id T:Type , A:AddAttributes2 => A ); ... </k>
+	<table-name> SetItem(N) </table-name>
+	<schema> M:Map => M[T / X] </schema> when notBool(A =/=K .K)
+
+rule <k> (ALTER TABLE N:Id ADD COLUMN X:Id T:Type ;) => .K ... </k>
+	<table-name> SetItem(N) </table-name>
+	<schema> M:Map => M[T / X] </schema>
+*/
+
+// ------ DROP COLUMNS ------- //
 //ALTER TABLE nometabella DROP nomecolonna;
 rule <k> ALTER TABLE N:Id ( Drop X:Id , D:DropAttributes => D ); ... </k>
 	<table-name> SetItem(N) </table-name>
-	<schema> M:Map X |-> _ => M </schema> when notBool(D =/=K .K)
+	<schema> M:Map => M[undef / X] </schema> when notBool(D =/=K .K)
 
 rule <k> ( ALTER TABLE N:Id Drop X:Id ; ) => .K ... </k>
 	<table-name> SetItem(N) </table-name>
-	<schema> M:Map X |-> _ => M </schema>
+	<schema> M:Map => M[undef / X] </schema>
+
+/* ALTER TABLE nometabella DROP COLUMN nomecolonna;
+rule <k> ALTER TABLE N:Id ( DROP COLUMN X:Id , D:DropAttributes2 => D ); ... </k>
+	<table-name> SetItem(N) </table-name>
+	<schema> M:Map => M[undef / X] </schema> when notBool(D =/=K .K)
+rule <k> ALTER TABLE N:Id DROP COLUMN X:Id ; => .K ... </k>
+	<table-name> SetItem(N) </table-name>
+	<schema> M:Map => M[undef / X] </schema>
+*/
 
 // ------ RENAME COLUMN ------- //
 rule <k> ALTER TABLE N:Id RENAME COLUMN X:Id TO B:Id , R:RenameColumnAttributes => R; ... </k>
@@ -129,17 +143,16 @@ rule <k> ALTER TABLE N:Id RENAME COLUMN X:Id TO B:Id ; => .K ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map X |-> T:Type => M[T / B] </schema>
 
-// ------ RENAME TABLE ------- //
+// ------ RENAME TABLE ------- // C'è un problema perchè non viene eliminato il comando anche con il .K
 rule <k> ALTER TABLE N:Id RENAME TO X:Id ; => .K ... </k>
 	<table-name> SetItem(N) => SetItem(X) </table-name>
 
-// ------ DROP TABLE ------- // 											DA FARE
-rule <k> DROP TABLE ( N:Id , T:Tables => T ) ; ... </k>
-	<table-name> SetItem(N) </table-name>
-//	<table> B:Bag => .B </table>
+///*// ------ DROP TABLE ------- // Non funziona il .Set non so perchè
+rule <k> DROP TABLE D:Tables => D ; ... </k>
+	<table-name> SetItem(D) => .Set </table-name>
 
-rule <k> DROP TABLE N:Id ; => .K ... </k>
-	<table-name> SetItem(N) </table-name>
-//	<table> B:Bag => .B </table>
+rule <k> DROP TABLE D:Tables ; => .K ... </k>
+	<table-name> SetItem(D) => .Set </table-name>
+//*/
 
 endmodule
