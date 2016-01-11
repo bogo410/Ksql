@@ -140,15 +140,14 @@ rule <k> ALTER TABLE N:Id RENAME COLUMN X:Id TO B:Id ; => .K ... </k>
 rule <k> ALTER TABLE N:Id RENAME TO X:Id ; => .K ... </k>
 	<table-name> SetItem(N) => SetItem(X) </table-name>
 
-// ------ DROP TABLE ------- // 
-rule <k> DROP TABLE N:Id , T:Tables => T ; ... </k>
-	( <table>...
-               <table-name> SetItem(N) </table-name>
-         ... </table> => . ) when notBool(T =/=K .K)
+
+// ------ DROP TABLE ------- // 											DA FARE
+rule <k> DROP TABLE ( N:Id , T:Tables => T ) ; ... </k>
+	<table-name> SetItem(N) </table-name>
+//	<table> B:Bag => .B </table>
 
 rule <k> DROP TABLE N:Id ; => .K ... </k>
-	( <table>...
-               <table-name> SetItem(N) </table-name>
-         ... </table> => . )
+	<table-name> SetItem(N) </table-name>
+//	<table> B:Bag => .B </table>
 
 endmodule
