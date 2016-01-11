@@ -7,13 +7,6 @@ module SQL-SYNTAX
 syntax Stmt ::=	"CREATE DATABASE" Id ";"
 			|	"CREATE TABLE" Id "(" Attributes ")" ";"
 			|	"ALTER TABLE" Id AlterCommands ";"
-
-/*			|	"ALTER TABLE" Id AddAttributes ";"
-			|	"ALTER TABLE" Id DropAttributes ";"
-	//Da verificare
-			|	"ALTER TABLE" Id RenameTable ";"
-			|	"ALTER TABLE" Id RenameColumnAttributes ";"
-*/
 			|	"DROP TABLE" Tables ";"
 
 syntax Stmts ::= 	Stmt
@@ -108,30 +101,31 @@ rule <k> ADD SCHEMA N:Id ( .Attributes ) ; => .K ... </k>
 
 // ------ ALTER TABLE ADD o ADD COLUMN  ------- //
 //aggiunge gli attributi alla tabella
-rule <k> ALTER TABLE N:Id ( Add X:Id T:Type , A:AlterCommands => A ); ... </k>
+rule <k> ALTER TABLE N:Id ( Add X:Id T:Type , A:AddAttributes => A ); ... </k>
 	<table-name> SetItem(N) </table-name>
-	<schema> M:Map => M[T / X] </schema> when notBool(A =/=K .K)
+	<schema> M:Map => M[T / X] </schema>
 
 //se l'attributo è uno solo consuma il comando e aggiunge l'attributo
 rule <k> ( ALTER TABLE N:Id Add X:Id T:Type ; ) => .K ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map => M[T / X] </schema>
 
-// ------ ALTER TABLE DROP o DROP COLUMN o DROP IF EXISTS DROP COLUMN IF EXISTS ------- //
+rule <k> ALTER TABLE  N:Id .AddAttributes ; => .K ... </k>
+
+// ------ ALTER TABLE DROP o DROP COLUMN o DROP IF EXISTS o DROP COLUMN IF EXISTS ------- //
 //elimina la colonna o le colonne in questione
-rule <k> ALTER TABLE N:Id ( Drop X:Id , A:AlterCommands => A ); ... </k>
+rule <k> ALTER TABLE N:Id Drop X:Id , D:DropAttributes => D ; ... </k>
 	<table-name> SetItem(N) </table-name>
-	<schema> M:Map X |-> _ => M </schema> when notBool(A =/=K .K)
+	<schema> M:Map X |-> _ => M </schema>
 
 rule <k> ( ALTER TABLE N:Id Drop X:Id ; ) => .K ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map X |-> _ => M </schema>
 
-// ------ ALTER TABLE RENAME COLUMN ------- //
-rule <k> ALTER TABLE N:Id RENAME COLUMN X:Id TO B:Id , A:AlterCommands => A; ... </k>
-	<table-name> SetItem(N) </table-name>
-	<schema> M:Map X |-> T:Type => M[T / B] </schema> when notBool(A =/=K .K)
+rule <k> ALTER TABLE  N:Id .DropAttributes ; => .K ... </k>
 
+// ------ ALTER TABLE RENAME COLUMN ------- //
+//rinomina la colonna in questione
 rule <k> ALTER TABLE N:Id RENAME COLUMN X:Id TO B:Id ; => .K ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map X |-> T:Type => M[T / B] </schema>
@@ -141,14 +135,17 @@ rule <k> ALTER TABLE N:Id RENAME TO X:Id ; => .K ... </k>
 	<table-name> SetItem(N) => SetItem(X) </table-name>
 
 // ------ DROP TABLE ------- // 
+//elimina la tabella o le tabelle in questione
 rule <k> DROP TABLE N:Id , T:Tables => T ; ... </k>
 	( <table>...
                <table-name> SetItem(N) </table-name>
-         ... </table> => . ) when notBool(T =/=K .K)
+         ... </table> => . )
 
 rule <k> DROP TABLE N:Id ; => .K ... </k>
 	( <table>...
                <table-name> SetItem(N) </table-name>
          ... </table> => . )
+//(lista vuota)
+rule <k> DROP TABLE .Tables ; => .K ... </k>
 
 endmodule
