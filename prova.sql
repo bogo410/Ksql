@@ -16,6 +16,9 @@ ALTER TABLE Students DROP Name;
 ALTER TABLE Student RENAME COLUMN AnnnoAccademico TO NewAnnnoAccademico;
 
 ALTER TABLE Student RENAME TO NewStudent;
+
+ALTER TABLE NewStudent ADD Name VARCHAR, DROP COLUMN IF EXISTS NewAnnnoAccademico;
+
 DROP TABLE NewTable1;
 DROP TABLE NewTable2, Newtable3;
 

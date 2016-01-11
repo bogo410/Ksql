@@ -7,7 +7,7 @@ ALTER TABLE name action [, ... ]
 where action is one of:
 
     ADD [ COLUMN ] column data_type 											OK
-    DROP [ COLUMN ] [ IF EXISTS ] column 										OK (manca IF EXIST)
+    DROP [ COLUMN ] [ IF EXISTS ] column 										OK (DROP IF EXISTS DROP 																		COLUMN IF EXISTS ?????)
     RENAME [ COLUMN ] column TO new_column										OK
     RENAME TO new_name															OK
     SET SCHEMA new_schema

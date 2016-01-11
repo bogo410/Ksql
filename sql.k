@@ -6,11 +6,14 @@ module SQL-SYNTAX
 // ------ comandi SQL ------ //
 syntax Stmt ::=	"CREATE DATABASE" Id ";"
 			|	"CREATE TABLE" Id "(" Attributes ")" ";"
-			|	"ALTER TABLE" Id AddAttributes ";"
+			|	"ALTER TABLE" Id AlterCommands ";"
+
+/*			|	"ALTER TABLE" Id AddAttributes ";"
 			|	"ALTER TABLE" Id DropAttributes ";"
 	//Da verificare
 			|	"ALTER TABLE" Id RenameTable ";"
 			|	"ALTER TABLE" Id RenameColumnAttributes ";"
+*/
 			|	"DROP TABLE" Tables ";"
 
 syntax Stmts ::= 	Stmt
@@ -33,6 +36,8 @@ syntax AddAttributes ::=	List{AddAttribute,","}
 
 syntax Drop ::=	"DROP"	
 			|	"DROP COLUMN"
+			|	"DROP IF EXISTS" 
+			|	"DROP COLUMN IF EXISTS"
 syntax DropAttribute ::=	Drop Id
 syntax DropAttributes ::= 	List{DropAttribute,","}
 
@@ -42,12 +47,12 @@ syntax RenameColumnAttributes ::= List{RenameColumnAttribute,","}
 syntax Tables ::= 	List{Id,","}
 syntax RenameTable ::=	"RENAME TO" Id
 
-//PROVA: l'idea è di avere un comando tipo: ALTER TABLE AlterCommand Id
-syntax AlterCommand ::=	"ADD"
-					|	"ADD COLUMN"
-					|	"DROP COLUMN"
-					|	"RENAME TO"
-					|	"RENAME COLUMN" Id "TO" Id// e questo??
+//PROVA: l'idea è di avere un comando tipo: ALTER TABLE Id AlterCommands
+syntax AlterCommand ::=	AddAttribute
+					|	DropAttribute
+					|	RenameColumnAttribute
+					|	RenameTable
+syntax AlterCommands ::=	List{AlterCommand,","}
 
 //syntax OpCodes ::= "ADD" Id | "ADD COLUMN" Id | "DROP COLUMN" Id | "RENAME TO" Id | "RENAME COLUMN" Id "TO" Id
 //syntax OpCodess ::= List{OpCodes,","}
@@ -79,10 +84,12 @@ module SQL
 //valuta il primo comando poi il secondo gruppo di comandi
 rule S1:Stmt S2:Stmts => S1 ~> S2
 
+// ------ CREATE DATABASE  ------- //
 //crea il database
 rule <k> CREATE DATABASE N:Id ; => .K ... </k>
 	<database-name> .Set => SetItem(N) </database-name>
 
+// ------ CREATE TABLE  ------- //
 //crea la tabella senza attributi
 rule <k> CREATE TABLE N:Id (A:Attributes) ; => ADD SCHEMA N ( A ) ; ... </k>
        ( . => <table>...
@@ -99,9 +106,9 @@ rule <k> ADD SCHEMA N:Id ( X:Id T:Type , A:Attributes => A) ; ... </k>
 //se gli attributi sono finiti consuma il comando( lo rimpiazza con .K cioè il comando vuoto di tipo K )
 rule <k> ADD SCHEMA N:Id ( .Attributes ) ; => .K ... </k>
 
-// ------ ADD o ADD COLUMN  ------- //
-//aggiunge uno o più attributi alla tabella
-rule <k> ALTER TABLE N:Id ( Add X:Id T:Type , A:AddAttributes => A ); ... </k>
+// ------ ALTER TABLE ADD o ADD COLUMN  ------- //
+//aggiunge gli attributi alla tabella
+rule <k> ALTER TABLE N:Id ( Add X:Id T:Type , A:AlterCommands => A ); ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map => M[T / X] </schema> when notBool(A =/=K .K)
 
@@ -110,26 +117,26 @@ rule <k> ( ALTER TABLE N:Id Add X:Id T:Type ; ) => .K ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map => M[T / X] </schema>
 
-// ------ DROP o DROP COLUMNS ------- //
-//ALTER TABLE nometabella DROP nomecolonna;
-rule <k> ALTER TABLE N:Id ( Drop X:Id , D:DropAttributes => D ); ... </k>
+// ------ ALTER TABLE DROP o DROP COLUMN o DROP IF EXISTS DROP COLUMN IF EXISTS ------- //
+//elimina la colonna o le colonne in questione
+rule <k> ALTER TABLE N:Id ( Drop X:Id , A:AlterCommands => A ); ... </k>
 	<table-name> SetItem(N) </table-name>
-	<schema> M:Map X |-> _ => M </schema> when notBool(D =/=K .K)
+	<schema> M:Map X |-> _ => M </schema> when notBool(A =/=K .K)
 
 rule <k> ( ALTER TABLE N:Id Drop X:Id ; ) => .K ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map X |-> _ => M </schema>
 
-// ------ RENAME COLUMN ------- //
-rule <k> ALTER TABLE N:Id RENAME COLUMN X:Id TO B:Id , R:RenameColumnAttributes => R; ... </k>
+// ------ ALTER TABLE RENAME COLUMN ------- //
+rule <k> ALTER TABLE N:Id RENAME COLUMN X:Id TO B:Id , A:AlterCommands => A; ... </k>
 	<table-name> SetItem(N) </table-name>
-	<schema> M:Map X |-> T:Type => M[T / B] </schema> when notBool(R =/=K .K)
+	<schema> M:Map X |-> T:Type => M[T / B] </schema> when notBool(A =/=K .K)
 
 rule <k> ALTER TABLE N:Id RENAME COLUMN X:Id TO B:Id ; => .K ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map X |-> T:Type => M[T / B] </schema>
 
-// ------ RENAME TABLE ------- //
+// ------ ALTER TABLE RENAME TABLE ------- //
 rule <k> ALTER TABLE N:Id RENAME TO X:Id ; => .K ... </k>
 	<table-name> SetItem(N) => SetItem(X) </table-name>
 
