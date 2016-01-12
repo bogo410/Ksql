@@ -9,7 +9,7 @@ ALTER TABLE Students ADD Anno SMALLINT;
 CREATE TABLE Newtable1();
 CREATE TABLE Newtable2();
 CREATE TABLE Newtable3();
-//ALTER TABLE Students DROP COLUMN Surname;
+
 ALTER TABLE Student DROP COLUMN Anno;
 ALTER TABLE Student ADD AnnoAccademico SMALLINT;
 
@@ -19,11 +19,8 @@ ALTER TABLE Student RENAME TO NewStudent;
 
 ALTER TABLE Students DROP Name, DROP IF EXISTS Surname;
 
-//DROP TABLE Newtable3;
-
 ALTER TABLE Students ADD A SMALLINT, ADD B SMALLINT;
 
 DROP TABLE Newtable2 , Newtable3;
 
 //ALTER TABLE NewStudent ADD Name VARCHAR, DROP COLUMN NewAnnnoAccademico;
-

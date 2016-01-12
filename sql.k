@@ -8,6 +8,7 @@ syntax Stmt ::=	"CREATE DATABASE" Id ";"
 			|	"CREATE TABLE" Id "(" Attributes ")" ";"
 			|	"ALTER TABLE" Id AlterCommands ";"
 			|	"DROP TABLE" Tables ";"
+			|	"INSERT INTO" Id "(" Columns ")" "VALUES" "(" Values ")" ";"
 
 syntax Stmts ::= 	Stmt
 				|	Stmt Stmts
@@ -21,6 +22,13 @@ syntax Command ::=	"ADD SCHEMA" Id "(" Attributes ")" ";"
 
 syntax Attribute ::= 	Id Type	
 syntax Attributes ::= 	List{Attribute,","}
+
+syntax Column ::= 	Id	
+syntax Columns ::= 	List{Attribute,","}
+
+syntax Value ::= Int
+				| "'" Id "'"
+syntax Values ::= List{Value,","}
 
 syntax Add ::=	"ADD"	
 			|	"ADD COLUMN"
@@ -117,7 +125,6 @@ rule <k> ALTER TABLE  N:Id .AddAttributes ; => .K ... </k>
 rule <k> ALTER TABLE N:Id Drop X:Id , D:DropAttributes => D ; ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map X |-> _ => M </schema>
-
 rule <k> ( ALTER TABLE N:Id Drop X:Id ; ) => .K ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map X |-> _ => M </schema>
@@ -140,12 +147,18 @@ rule <k> DROP TABLE N:Id , T:Tables => T ; ... </k>
 	( <table>...
                <table-name> SetItem(N) </table-name>
          ... </table> => . )
-
 rule <k> DROP TABLE N:Id ; => .K ... </k>
 	( <table>...
                <table-name> SetItem(N) </table-name>
          ... </table> => . )
 //(lista vuota)
 rule <k> DROP TABLE .Tables ; => .K ... </k>
+
+// ------ INSERT INTO ------- // 
+rule <k> INSERT INTO N:Id (I:Id , C:Columns) VALUES (V:Value , W:Values) ; ... => INSERT INTO N ( C ) VALUES ( W ) ; ... </k>
+	(
+		
+	)
+
 
 endmodule
