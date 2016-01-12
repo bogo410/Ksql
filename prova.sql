@@ -25,4 +25,4 @@ DROP TABLE Newtable2 , Newtable3;
 
 //ALTER TABLE NewStudent ADD Name VARCHAR, DROP COLUMN NewAnnnoAccademico;
 CREATE TABLE Prova (Try SMALLINT);
-INSERT INTO NewStudent (Try) VALUES (5);
+INSERT INTO Prova (Try) VALUES (5);

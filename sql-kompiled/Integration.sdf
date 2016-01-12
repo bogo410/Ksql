@@ -110,109 +110,113 @@ context-free priorities
 {
     Nat -> K
     Add -> K
-    AddAttribute -> K
-    Variable -> K
     MySet -> K
-    Stmts -> K
-    RenameColumnAttribute -> K
     MyMap -> K
-    Attribute -> K
-    AddAttributes -> K
     Attributes -> K
     Values -> K
     String -> K
-    Int -> K
-    Stmt -> K
     DdropAttributes -> K
     Bool -> K
-    Char -> K
-    Tables -> K
     Stream -> K
-    TCPAnswer -> K
-    DzInt -> K
-    RenameColumnAttributes -> K
     DzString -> K
     DzBool -> K
     DdropAttribute -> K
     AlterCommands -> K
-    MyBag -> K
-    Columns -> K
-    TCPError -> K
     Ddrop -> K
     Float -> K
-    Type -> K
     RenameTable -> K
-    AlterCommand -> K
-    Command -> K
     MyList -> K
     Value -> K
     Id -> K
     DzFloat -> K
+    AddAttribute -> K
+    Variable -> K
+    Stmts -> K
+    RenameColumnAttribute -> K
+    Attribute -> K
+    AddAttributes -> K
+    Int -> K
+    Stmt -> K
+    Column -> K
+    Char -> K
+    Tables -> K
+    TCPAnswer -> K
+    DzInt -> K
+    RenameColumnAttributes -> K
+    MyBag -> K
+    Columns -> K
+    TCPError -> K
+    Type -> K
+    AlterCommand -> K
+    Command -> K
 } .> {
-    DzFloat -> Float
-    RenameTable -> AlterCommand
-    RenameColumnAttributes -> AlterCommands
-    Value -> Values
+    Column -> Columns
     TCPError -> TCPAnswer
     DzInt -> Int
     Attribute -> Attributes
     Int -> Value
     AddAttribute -> AddAttributes
-    DzString -> String
-    Id -> Columns
     AddAttribute -> AlterCommand
+    Id -> Column
+    DdropAttribute -> DdropAttributes
+    DzBool -> Bool
+    Stmt -> Stmts
+    Id -> Tables
+    DzFloat -> Float
+    RenameTable -> AlterCommand
+    RenameColumnAttributes -> AlterCommands
+    Value -> Values
+    DzString -> String
     String -> TCPAnswer
     AlterCommand -> AlterCommands
     AddAttributes -> AlterCommands
     RenameColumnAttribute -> AlterCommand
     DdropAttribute -> AlterCommand
+    Tables -> Columns
     RenameColumnAttribute -> RenameColumnAttributes
     DdropAttributes -> AlterCommands
-    DdropAttribute -> DdropAttributes
-    DzBool -> Bool
-    Stmt -> Stmts
-    Id -> Tables
 } .> {
     K -> Nat
     K -> Add
-    K -> AddAttribute
-    K -> Variable
     K -> MySet
-    K -> Stmts
-    K -> RenameColumnAttribute
     K -> MyMap
-    K -> Attribute
-    K -> AddAttributes
     K -> Attributes
     K -> Values
     K -> String
-    K -> Int
-    K -> Stmt
     K -> DdropAttributes
     K -> Bool
-    K -> Char
-    K -> Tables
     K -> Stream
-    K -> TCPAnswer
-    K -> DzInt
-    K -> RenameColumnAttributes
     K -> DzString
     K -> DzBool
     K -> DdropAttribute
     K -> AlterCommands
-    K -> MyBag
-    K -> Columns
-    K -> TCPError
     K -> Ddrop
     K -> Float
-    K -> Type
     K -> RenameTable
-    K -> AlterCommand
-    K -> Command
     K -> MyList
     K -> Value
     K -> Id
     K -> DzFloat
+    K -> AddAttribute
+    K -> Variable
+    K -> Stmts
+    K -> RenameColumnAttribute
+    K -> Attribute
+    K -> AddAttributes
+    K -> Int
+    K -> Stmt
+    K -> Column
+    K -> Char
+    K -> Tables
+    K -> TCPAnswer
+    K -> DzInt
+    K -> RenameColumnAttributes
+    K -> MyBag
+    K -> Columns
+    K -> TCPError
+    K -> Type
+    K -> AlterCommand
+    K -> Command
 }
 
 %% subsorts 1a
@@ -220,85 +224,87 @@ context-free priorities
 {
     Nat -> K
     Add -> K
-    AddAttribute -> K
-    Variable -> K
     MySet -> K
-    Stmts -> K
-    RenameColumnAttribute -> K
     MyMap -> K
-    Attribute -> K
-    AddAttributes -> K
     Attributes -> K
     Values -> K
     String -> K
-    Int -> K
-    Stmt -> K
     DdropAttributes -> K
     Bool -> K
-    Char -> K
-    Tables -> K
     Stream -> K
-    TCPAnswer -> K
-    DzInt -> K
-    RenameColumnAttributes -> K
     DzString -> K
     DzBool -> K
     DdropAttribute -> K
     AlterCommands -> K
-    MyBag -> K
-    Columns -> K
-    TCPError -> K
     Ddrop -> K
     Float -> K
-    Type -> K
     RenameTable -> K
-    AlterCommand -> K
-    Command -> K
     MyList -> K
     Value -> K
     Id -> K
     DzFloat -> K
+    AddAttribute -> K
+    Variable -> K
+    Stmts -> K
+    RenameColumnAttribute -> K
+    Attribute -> K
+    AddAttributes -> K
+    Int -> K
+    Stmt -> K
+    Column -> K
+    Char -> K
+    Tables -> K
+    TCPAnswer -> K
+    DzInt -> K
+    RenameColumnAttributes -> K
+    MyBag -> K
+    Columns -> K
+    TCPError -> K
+    Type -> K
+    AlterCommand -> K
+    Command -> K
 } .> {
     K -> Nat
     K -> Add
-    K -> AddAttribute
-    K -> Variable
     K -> MySet
-    K -> Stmts
-    K -> RenameColumnAttribute
     K -> MyMap
-    K -> Attribute
-    K -> AddAttributes
     K -> Attributes
     K -> Values
     K -> String
-    K -> Int
-    K -> Stmt
     K -> DdropAttributes
     K -> Bool
-    K -> Char
-    K -> Tables
     K -> Stream
-    K -> TCPAnswer
-    K -> DzInt
-    K -> RenameColumnAttributes
     K -> DzString
     K -> DzBool
     K -> DdropAttribute
     K -> AlterCommands
-    K -> MyBag
-    K -> Columns
-    K -> TCPError
     K -> Ddrop
     K -> Float
-    K -> Type
     K -> RenameTable
-    K -> AlterCommand
-    K -> Command
     K -> MyList
     K -> Value
     K -> Id
     K -> DzFloat
+    K -> AddAttribute
+    K -> Variable
+    K -> Stmts
+    K -> RenameColumnAttribute
+    K -> Attribute
+    K -> AddAttributes
+    K -> Int
+    K -> Stmt
+    K -> Column
+    K -> Char
+    K -> Tables
+    K -> TCPAnswer
+    K -> DzInt
+    K -> RenameColumnAttributes
+    K -> MyBag
+    K -> Columns
+    K -> TCPError
+    K -> Type
+    K -> AlterCommand
+    K -> Command
 }
 
 %% subsorts 2
@@ -306,85 +312,87 @@ context-free priorities
 {
     K -> Nat
     K -> Add
-    K -> AddAttribute
-    K -> Variable
     K -> MySet
-    K -> Stmts
-    K -> RenameColumnAttribute
     K -> MyMap
-    K -> Attribute
-    K -> AddAttributes
     K -> Attributes
     K -> Values
     K -> String
-    K -> Int
-    K -> Stmt
     K -> DdropAttributes
     K -> Bool
-    K -> Char
-    K -> Tables
     K -> Stream
-    K -> TCPAnswer
-    K -> DzInt
-    K -> RenameColumnAttributes
     K -> DzString
     K -> DzBool
     K -> DdropAttribute
     K -> AlterCommands
-    K -> MyBag
-    K -> Columns
-    K -> TCPError
     K -> Ddrop
     K -> Float
-    K -> Type
     K -> RenameTable
-    K -> AlterCommand
-    K -> Command
     K -> MyList
     K -> Value
     K -> Id
     K -> DzFloat
+    K -> AddAttribute
+    K -> Variable
+    K -> Stmts
+    K -> RenameColumnAttribute
+    K -> Attribute
+    K -> AddAttributes
+    K -> Int
+    K -> Stmt
+    K -> Column
+    K -> Char
+    K -> Tables
+    K -> TCPAnswer
+    K -> DzInt
+    K -> RenameColumnAttributes
+    K -> MyBag
+    K -> Columns
+    K -> TCPError
+    K -> Type
+    K -> AlterCommand
+    K -> Command
 } .> {
     Nat -> K
     Add -> K
-    AddAttribute -> K
-    Variable -> K
     MySet -> K
-    Stmts -> K
-    RenameColumnAttribute -> K
     MyMap -> K
-    Attribute -> K
-    AddAttributes -> K
     Attributes -> K
     Values -> K
     String -> K
-    Int -> K
-    Stmt -> K
     DdropAttributes -> K
     Bool -> K
-    Char -> K
-    Tables -> K
     Stream -> K
-    TCPAnswer -> K
-    DzInt -> K
-    RenameColumnAttributes -> K
     DzString -> K
     DzBool -> K
     DdropAttribute -> K
     AlterCommands -> K
-    MyBag -> K
-    Columns -> K
-    TCPError -> K
     Ddrop -> K
     Float -> K
-    Type -> K
     RenameTable -> K
-    AlterCommand -> K
-    Command -> K
     MyList -> K
     Value -> K
     Id -> K
     DzFloat -> K
+    AddAttribute -> K
+    Variable -> K
+    Stmts -> K
+    RenameColumnAttribute -> K
+    Attribute -> K
+    AddAttributes -> K
+    Int -> K
+    Stmt -> K
+    Column -> K
+    Char -> K
+    Tables -> K
+    TCPAnswer -> K
+    DzInt -> K
+    RenameColumnAttributes -> K
+    MyBag -> K
+    Columns -> K
+    TCPError -> K
+    Type -> K
+    AlterCommand -> K
+    Command -> K
 }
 context-free syntax
     "isVariable" "(" InsertDzMap ")" -> Bool {cons("Bool1356Syn")}
@@ -394,6 +402,7 @@ context-free syntax
     Map "<=Map" Map -> Bool {cons("Bool130Syn")}
     "#ioError" "(" InsertDzString ")" -> K {cons("K1379Syn")}
     "size" "(" InsertDzMyBag ")" -> Int {cons("Int1404Syn")}
+    Id -> Column {}
     "SMTLibQuery" "(" InsertDzBool ")" -> String {cons("String1349Syn")}
     "Vars2SMTLib" "(" InsertDzSet ")" -> String {cons("String1347Syn")}
     String "=/=String" String -> Bool {left, cons("Bool1228Syn")}
@@ -491,7 +500,6 @@ context-free syntax
     "isBounding" "(" InsertDzKLabel "," InsertDzInt ")" -> Bool {cons("Bool1325Syn")}
     "#ENOTDIR" -> TCPError {cons("TCPError1249Syn")}
     "String2Id" "(" InsertDzString ")" -> Id {cons("Id1244Syn")}
-    "INSERT INTO" InsertDzId "(" InsertDzColumns ")" "VALUES" "(" InsertDzValues ")" ";" -> Stmt {cons("Stmt1445Syn")}
     "#freshSym" "(" InsertDzK ")" -> K {cons("K1368Syn")}
     "#ENOENT" -> TCPError {cons("TCPError1248Syn")}
     "size" "(" InsertDzMyMap ")" -> Int {cons("Int1434Syn")}
@@ -513,12 +521,11 @@ context-free syntax
     "KLabel2String" "(" InsertDzKLabel ")" -> String {cons("String1209Syn")}
     List "=List" List -> Bool {cons("Bool143Syn")}
     "#lstat" "(" InsertDzString ")" -> KList {cons("KList1382Syn")}
+    "INSERT INTO" InsertDzId "(" InsertDzId ")" "VALUES" "(" InsertDzValue ")" ";" -> Stmt {cons("Stmt1445Syn")}
     "#getVarsFromK" "(" InsertDzK ")" -> Set {cons("Set1306Syn")}
     "#distinctCounter" "(" InsertDzInt ")" -> Int {cons("Int1265Syn")}
     "#getc" "(" InsertDzInt ")" -> KItem {cons("KItem1373Syn")}
     "CREATE TABLE" InsertDzId "(" InsertDzAttributes ")" ";" -> Stmt {cons("Stmt1442Syn")}
-    Id "," Columns -> Columns {cons("Columns1ListSyn")}
-    ".Columns" -> Columns {cons("Columns1Empty")}
     "'" InsertDzString "'" -> Value {cons("Value1452Syn")}
     Map "[" InsertDzKList "/" InsertDzKList "]" -> Map {cons("Map1273Syn")}
     "#tcpRequest" "(" InsertDzString ")" -> TCPAnswer {cons("TCPAnswer1258Syn")}
@@ -544,6 +551,8 @@ context-free syntax
     "Consts2SMTLib" "(" InsertDzSet ")" -> String {cons("String1348Syn")}
     Attribute "," Attributes -> Attributes {cons("Attributes1ListSyn")}
     ".Attributes" -> Attributes {cons("Attributes1Empty")}
+    Column "," Columns -> Columns {cons("Columns1ListSyn")}
+    ".Columns" -> Columns {cons("Columns1Empty")}
     "#evalHelper" Map -> Bag {cons("Bag1EvalHelperSyn")}
     "#ENAMETOOLONG" -> TCPError {cons("TCPError1253Syn")}
     "absInt" "(" InsertDzInt ")" -> Int {cons("Int166Syn")}
@@ -682,11 +691,9 @@ context-free syntax
     MySet    -> InsertDzMySet
     AlterCommands    -> InsertDzAlterCommands
     MyMap    -> InsertDzMyMap
-    Values    -> InsertDzValues
     Attributes    -> InsertDzAttributes
     MyBag    -> InsertDzMyBag
     Bag    -> InsertDzBag
-    Columns    -> InsertDzColumns
     K    -> InsertDzK
     String    -> InsertDzString
     KList    -> InsertDzKList
@@ -696,6 +703,7 @@ context-free syntax
     Bool    -> InsertDzBool
     Char    -> InsertDzChar
     MyList    -> InsertDzMyList
+    Value    -> InsertDzValue
     Tables    -> InsertDzTables
     List    -> InsertDzList
     Id    -> InsertDzId
@@ -706,125 +714,128 @@ context-free syntax
 
     VARID  ":Nat"        -> NatDzVar            {cons("Nat12Var")}
     VARID  ":Add"        -> AddDzVar            {cons("Add12Var")}
-    VARID  ":AddAttribute"        -> AddAttributeDzVar            {cons("AddAttribute12Var")}
-    VARID  ":Variable"        -> VariableDzVar            {cons("Variable12Var")}
     VARID  ":MySet"        -> MySetDzVar            {cons("MySet12Var")}
-    VARID  ":Stmts"        -> StmtsDzVar            {cons("Stmts12Var")}
-    VARID  ":RenameColumnAttribute"        -> RenameColumnAttributeDzVar            {cons("RenameColumnAttribute12Var")}
     VARID  ":MyMap"        -> MyMapDzVar            {cons("MyMap12Var")}
-    VARID  ":Attribute"        -> AttributeDzVar            {cons("Attribute12Var")}
-    VARID  ":AddAttributes"        -> AddAttributesDzVar            {cons("AddAttributes12Var")}
     VARID  ":Attributes"        -> AttributesDzVar            {cons("Attributes12Var")}
     VARID  ":Values"        -> ValuesDzVar            {cons("Values12Var")}
     VARID  ":String"        -> StringDzVar            {cons("String12Var")}
-    VARID  ":Int"        -> IntDzVar            {cons("Int12Var")}
-    VARID  ":Stmt"        -> StmtDzVar            {cons("Stmt12Var")}
     VARID  ":DropAttributes"        -> DdropAttributesDzVar            {cons("DdropAttributes12Var")}
     VARID  ":Bool"        -> BoolDzVar            {cons("Bool12Var")}
-    VARID  ":Char"        -> CharDzVar            {cons("Char12Var")}
-    VARID  ":Tables"        -> TablesDzVar            {cons("Tables12Var")}
     VARID  ":Stream"        -> StreamDzVar            {cons("Stream12Var")}
-    VARID  ":TCPAnswer"        -> TCPAnswerDzVar            {cons("TCPAnswer12Var")}
-    VARID  ":#Int"        -> DzIntDzVar            {cons("DzInt12Var")}
-    VARID  ":RenameColumnAttributes"        -> RenameColumnAttributesDzVar            {cons("RenameColumnAttributes12Var")}
     VARID  ":#String"        -> DzStringDzVar            {cons("DzString12Var")}
     VARID  ":#Bool"        -> DzBoolDzVar            {cons("DzBool12Var")}
     VARID  ":DropAttribute"        -> DdropAttributeDzVar            {cons("DdropAttribute12Var")}
     VARID  ":AlterCommands"        -> AlterCommandsDzVar            {cons("AlterCommands12Var")}
-    VARID  ":MyBag"        -> MyBagDzVar            {cons("MyBag12Var")}
-    VARID  ":Columns"        -> ColumnsDzVar            {cons("Columns12Var")}
-    VARID  ":TCPError"        -> TCPErrorDzVar            {cons("TCPError12Var")}
     VARID  ":Drop"        -> DdropDzVar            {cons("Ddrop12Var")}
     VARID  ":Float"        -> FloatDzVar            {cons("Float12Var")}
-    VARID  ":Type"        -> TypeDzVar            {cons("Type12Var")}
     VARID  ":RenameTable"        -> RenameTableDzVar            {cons("RenameTable12Var")}
-    VARID  ":AlterCommand"        -> AlterCommandDzVar            {cons("AlterCommand12Var")}
-    VARID  ":Command"        -> CommandDzVar            {cons("Command12Var")}
     VARID  ":MyList"        -> MyListDzVar            {cons("MyList12Var")}
     VARID  ":Value"        -> ValueDzVar            {cons("Value12Var")}
     VARID  ":Id"        -> IdDzVar            {cons("Id12Var")}
     VARID  ":#Float"        -> DzFloatDzVar            {cons("DzFloat12Var")}
+    VARID  ":AddAttribute"        -> AddAttributeDzVar            {cons("AddAttribute12Var")}
+    VARID  ":Variable"        -> VariableDzVar            {cons("Variable12Var")}
+    VARID  ":Stmts"        -> StmtsDzVar            {cons("Stmts12Var")}
+    VARID  ":RenameColumnAttribute"        -> RenameColumnAttributeDzVar            {cons("RenameColumnAttribute12Var")}
+    VARID  ":Attribute"        -> AttributeDzVar            {cons("Attribute12Var")}
+    VARID  ":AddAttributes"        -> AddAttributesDzVar            {cons("AddAttributes12Var")}
+    VARID  ":Int"        -> IntDzVar            {cons("Int12Var")}
+    VARID  ":Stmt"        -> StmtDzVar            {cons("Stmt12Var")}
+    VARID  ":Column"        -> ColumnDzVar            {cons("Column12Var")}
+    VARID  ":Char"        -> CharDzVar            {cons("Char12Var")}
+    VARID  ":Tables"        -> TablesDzVar            {cons("Tables12Var")}
+    VARID  ":TCPAnswer"        -> TCPAnswerDzVar            {cons("TCPAnswer12Var")}
+    VARID  ":#Int"        -> DzIntDzVar            {cons("DzInt12Var")}
+    VARID  ":RenameColumnAttributes"        -> RenameColumnAttributesDzVar            {cons("RenameColumnAttributes12Var")}
+    VARID  ":MyBag"        -> MyBagDzVar            {cons("MyBag12Var")}
+    VARID  ":Columns"        -> ColumnsDzVar            {cons("Columns12Var")}
+    VARID  ":TCPError"        -> TCPErrorDzVar            {cons("TCPError12Var")}
+    VARID  ":Type"        -> TypeDzVar            {cons("Type12Var")}
+    VARID  ":AlterCommand"        -> AlterCommandDzVar            {cons("AlterCommand12Var")}
+    VARID  ":Command"        -> CommandDzVar            {cons("Command12Var")}
 
      K CastTypeDz "Nat"    -> NatDzVar    {cons("Nat1Cast")}
      K CastTypeDz "Add"    -> AddDzVar    {cons("Add1Cast")}
-     K CastTypeDz "AddAttribute"    -> AddAttributeDzVar    {cons("AddAttribute1Cast")}
-     K CastTypeDz "Variable"    -> VariableDzVar    {cons("Variable1Cast")}
      K CastTypeDz "MySet"    -> MySetDzVar    {cons("MySet1Cast")}
-     K CastTypeDz "Stmts"    -> StmtsDzVar    {cons("Stmts1Cast")}
-     K CastTypeDz "RenameColumnAttribute"    -> RenameColumnAttributeDzVar    {cons("RenameColumnAttribute1Cast")}
      K CastTypeDz "MyMap"    -> MyMapDzVar    {cons("MyMap1Cast")}
-     K CastTypeDz "Attribute"    -> AttributeDzVar    {cons("Attribute1Cast")}
-     K CastTypeDz "AddAttributes"    -> AddAttributesDzVar    {cons("AddAttributes1Cast")}
      K CastTypeDz "Attributes"    -> AttributesDzVar    {cons("Attributes1Cast")}
      K CastTypeDz "Values"    -> ValuesDzVar    {cons("Values1Cast")}
      K CastTypeDz "String"    -> StringDzVar    {cons("String1Cast")}
-     K CastTypeDz "Int"    -> IntDzVar    {cons("Int1Cast")}
-     K CastTypeDz "Stmt"    -> StmtDzVar    {cons("Stmt1Cast")}
      K CastTypeDz "DropAttributes"    -> DdropAttributesDzVar    {cons("DdropAttributes1Cast")}
      K CastTypeDz "Bool"    -> BoolDzVar    {cons("Bool1Cast")}
-     K CastTypeDz "Char"    -> CharDzVar    {cons("Char1Cast")}
-     K CastTypeDz "Tables"    -> TablesDzVar    {cons("Tables1Cast")}
      K CastTypeDz "Stream"    -> StreamDzVar    {cons("Stream1Cast")}
-     K CastTypeDz "TCPAnswer"    -> TCPAnswerDzVar    {cons("TCPAnswer1Cast")}
-     K CastTypeDz "#Int"    -> DzIntDzVar    {cons("DzInt1Cast")}
-     K CastTypeDz "RenameColumnAttributes"    -> RenameColumnAttributesDzVar    {cons("RenameColumnAttributes1Cast")}
      K CastTypeDz "#String"    -> DzStringDzVar    {cons("DzString1Cast")}
      K CastTypeDz "#Bool"    -> DzBoolDzVar    {cons("DzBool1Cast")}
      K CastTypeDz "DropAttribute"    -> DdropAttributeDzVar    {cons("DdropAttribute1Cast")}
      K CastTypeDz "AlterCommands"    -> AlterCommandsDzVar    {cons("AlterCommands1Cast")}
-     K CastTypeDz "MyBag"    -> MyBagDzVar    {cons("MyBag1Cast")}
-     K CastTypeDz "Columns"    -> ColumnsDzVar    {cons("Columns1Cast")}
-     K CastTypeDz "TCPError"    -> TCPErrorDzVar    {cons("TCPError1Cast")}
      K CastTypeDz "Drop"    -> DdropDzVar    {cons("Ddrop1Cast")}
      K CastTypeDz "Float"    -> FloatDzVar    {cons("Float1Cast")}
-     K CastTypeDz "Type"    -> TypeDzVar    {cons("Type1Cast")}
      K CastTypeDz "RenameTable"    -> RenameTableDzVar    {cons("RenameTable1Cast")}
-     K CastTypeDz "AlterCommand"    -> AlterCommandDzVar    {cons("AlterCommand1Cast")}
-     K CastTypeDz "Command"    -> CommandDzVar    {cons("Command1Cast")}
      K CastTypeDz "MyList"    -> MyListDzVar    {cons("MyList1Cast")}
      K CastTypeDz "Value"    -> ValueDzVar    {cons("Value1Cast")}
      K CastTypeDz "Id"    -> IdDzVar    {cons("Id1Cast")}
      K CastTypeDz "#Float"    -> DzFloatDzVar    {cons("DzFloat1Cast")}
+     K CastTypeDz "AddAttribute"    -> AddAttributeDzVar    {cons("AddAttribute1Cast")}
+     K CastTypeDz "Variable"    -> VariableDzVar    {cons("Variable1Cast")}
+     K CastTypeDz "Stmts"    -> StmtsDzVar    {cons("Stmts1Cast")}
+     K CastTypeDz "RenameColumnAttribute"    -> RenameColumnAttributeDzVar    {cons("RenameColumnAttribute1Cast")}
+     K CastTypeDz "Attribute"    -> AttributeDzVar    {cons("Attribute1Cast")}
+     K CastTypeDz "AddAttributes"    -> AddAttributesDzVar    {cons("AddAttributes1Cast")}
+     K CastTypeDz "Int"    -> IntDzVar    {cons("Int1Cast")}
+     K CastTypeDz "Stmt"    -> StmtDzVar    {cons("Stmt1Cast")}
+     K CastTypeDz "Column"    -> ColumnDzVar    {cons("Column1Cast")}
+     K CastTypeDz "Char"    -> CharDzVar    {cons("Char1Cast")}
+     K CastTypeDz "Tables"    -> TablesDzVar    {cons("Tables1Cast")}
+     K CastTypeDz "TCPAnswer"    -> TCPAnswerDzVar    {cons("TCPAnswer1Cast")}
+     K CastTypeDz "#Int"    -> DzIntDzVar    {cons("DzInt1Cast")}
+     K CastTypeDz "RenameColumnAttributes"    -> RenameColumnAttributesDzVar    {cons("RenameColumnAttributes1Cast")}
+     K CastTypeDz "MyBag"    -> MyBagDzVar    {cons("MyBag1Cast")}
+     K CastTypeDz "Columns"    -> ColumnsDzVar    {cons("Columns1Cast")}
+     K CastTypeDz "TCPError"    -> TCPErrorDzVar    {cons("TCPError1Cast")}
+     K CastTypeDz "Type"    -> TypeDzVar    {cons("Type1Cast")}
+     K CastTypeDz "AlterCommand"    -> AlterCommandDzVar    {cons("AlterCommand1Cast")}
+     K CastTypeDz "Command"    -> CommandDzVar    {cons("Command1Cast")}
      NatDzVar   -> Nat
      AddDzVar   -> Add
-     AddAttributeDzVar   -> AddAttribute
-     VariableDzVar   -> Variable
      MySetDzVar   -> MySet
-     StmtsDzVar   -> Stmts
-     RenameColumnAttributeDzVar   -> RenameColumnAttribute
      MyMapDzVar   -> MyMap
-     AttributeDzVar   -> Attribute
-     AddAttributesDzVar   -> AddAttributes
      AttributesDzVar   -> Attributes
      ValuesDzVar   -> Values
      StringDzVar   -> String
-     IntDzVar   -> Int
-     StmtDzVar   -> Stmt
      DdropAttributesDzVar   -> DdropAttributes
      BoolDzVar   -> Bool
-     CharDzVar   -> Char
-     TablesDzVar   -> Tables
      StreamDzVar   -> Stream
-     TCPAnswerDzVar   -> TCPAnswer
-     DzIntDzVar   -> DzInt
-     RenameColumnAttributesDzVar   -> RenameColumnAttributes
      DzStringDzVar   -> DzString
      DzBoolDzVar   -> DzBool
      DdropAttributeDzVar   -> DdropAttribute
      AlterCommandsDzVar   -> AlterCommands
-     MyBagDzVar   -> MyBag
-     ColumnsDzVar   -> Columns
-     TCPErrorDzVar   -> TCPError
      DdropDzVar   -> Ddrop
      FloatDzVar   -> Float
-     TypeDzVar   -> Type
      RenameTableDzVar   -> RenameTable
-     AlterCommandDzVar   -> AlterCommand
-     CommandDzVar   -> Command
      MyListDzVar   -> MyList
      ValueDzVar   -> Value
      IdDzVar   -> Id
      DzFloatDzVar   -> DzFloat
+     AddAttributeDzVar   -> AddAttribute
+     VariableDzVar   -> Variable
+     StmtsDzVar   -> Stmts
+     RenameColumnAttributeDzVar   -> RenameColumnAttribute
+     AttributeDzVar   -> Attribute
+     AddAttributesDzVar   -> AddAttributes
+     IntDzVar   -> Int
+     StmtDzVar   -> Stmt
+     ColumnDzVar   -> Column
+     CharDzVar   -> Char
+     TablesDzVar   -> Tables
+     TCPAnswerDzVar   -> TCPAnswer
+     DzIntDzVar   -> DzInt
+     RenameColumnAttributesDzVar   -> RenameColumnAttributes
+     MyBagDzVar   -> MyBag
+     ColumnsDzVar   -> Columns
+     TCPErrorDzVar   -> TCPError
+     TypeDzVar   -> Type
+     AlterCommandDzVar   -> AlterCommand
+     CommandDzVar   -> Command
      K CastTypeDz "K"        -> VariableDz    {cons("K1Cast")}
      K CastTypeDz "KItem"    -> VariableDz    {cons("KItem1Cast")}
 
@@ -842,44 +853,45 @@ context-free syntax
 context-free restrictions
     NatDzVar -/- [a-zA-Z0-9]
     AddDzVar -/- [a-zA-Z0-9]
-    AddAttributeDzVar -/- [a-zA-Z0-9]
-    VariableDzVar -/- [a-zA-Z0-9]
     MySetDzVar -/- [a-zA-Z0-9]
-    StmtsDzVar -/- [a-zA-Z0-9]
-    RenameColumnAttributeDzVar -/- [a-zA-Z0-9]
     MyMapDzVar -/- [a-zA-Z0-9]
-    AttributeDzVar -/- [a-zA-Z0-9]
-    AddAttributesDzVar -/- [a-zA-Z0-9]
     AttributesDzVar -/- [a-zA-Z0-9]
     ValuesDzVar -/- [a-zA-Z0-9]
     StringDzVar -/- [a-zA-Z0-9]
-    IntDzVar -/- [a-zA-Z0-9]
-    StmtDzVar -/- [a-zA-Z0-9]
     DdropAttributesDzVar -/- [a-zA-Z0-9]
     BoolDzVar -/- [a-zA-Z0-9]
-    CharDzVar -/- [a-zA-Z0-9]
-    TablesDzVar -/- [a-zA-Z0-9]
     StreamDzVar -/- [a-zA-Z0-9]
-    TCPAnswerDzVar -/- [a-zA-Z0-9]
-    DzIntDzVar -/- [a-zA-Z0-9]
-    RenameColumnAttributesDzVar -/- [a-zA-Z0-9]
     DzStringDzVar -/- [a-zA-Z0-9]
     DzBoolDzVar -/- [a-zA-Z0-9]
     DdropAttributeDzVar -/- [a-zA-Z0-9]
     AlterCommandsDzVar -/- [a-zA-Z0-9]
-    MyBagDzVar -/- [a-zA-Z0-9]
-    ColumnsDzVar -/- [a-zA-Z0-9]
-    TCPErrorDzVar -/- [a-zA-Z0-9]
     DdropDzVar -/- [a-zA-Z0-9]
     FloatDzVar -/- [a-zA-Z0-9]
-    TypeDzVar -/- [a-zA-Z0-9]
     RenameTableDzVar -/- [a-zA-Z0-9]
-    AlterCommandDzVar -/- [a-zA-Z0-9]
-    CommandDzVar -/- [a-zA-Z0-9]
     MyListDzVar -/- [a-zA-Z0-9]
     ValueDzVar -/- [a-zA-Z0-9]
     IdDzVar -/- [a-zA-Z0-9]
     DzFloatDzVar -/- [a-zA-Z0-9]
+    AddAttributeDzVar -/- [a-zA-Z0-9]
+    VariableDzVar -/- [a-zA-Z0-9]
+    StmtsDzVar -/- [a-zA-Z0-9]
+    RenameColumnAttributeDzVar -/- [a-zA-Z0-9]
+    AttributeDzVar -/- [a-zA-Z0-9]
+    AddAttributesDzVar -/- [a-zA-Z0-9]
+    IntDzVar -/- [a-zA-Z0-9]
+    StmtDzVar -/- [a-zA-Z0-9]
+    ColumnDzVar -/- [a-zA-Z0-9]
+    CharDzVar -/- [a-zA-Z0-9]
+    TablesDzVar -/- [a-zA-Z0-9]
+    TCPAnswerDzVar -/- [a-zA-Z0-9]
+    DzIntDzVar -/- [a-zA-Z0-9]
+    RenameColumnAttributesDzVar -/- [a-zA-Z0-9]
+    MyBagDzVar -/- [a-zA-Z0-9]
+    ColumnsDzVar -/- [a-zA-Z0-9]
+    TCPErrorDzVar -/- [a-zA-Z0-9]
+    TypeDzVar -/- [a-zA-Z0-9]
+    AlterCommandDzVar -/- [a-zA-Z0-9]
+    CommandDzVar -/- [a-zA-Z0-9]
     VariableDz -/- [a-zA-Z0-9]
 lexical syntax
     "redex" -> DzKLabel
@@ -905,69 +917,30 @@ lexical syntax
     "isAdd"      -> DzKLabel
     "isSymbolicAdd"      -> DzKLabel
     "#symAdd"      -> DzKLabel
-    "isAddAttribute"      -> DzKLabel
-    "isSymbolicAddAttribute"      -> DzKLabel
-    "#symAddAttribute"      -> DzKLabel
-    "isVariable"      -> DzKLabel
-    "isSymbolicVariable"      -> DzKLabel
-    "#symVariable"      -> DzKLabel
     "isMySet"      -> DzKLabel
     "isSymbolicMySet"      -> DzKLabel
     "#symMySet"      -> DzKLabel
-    "isStmts"      -> DzKLabel
-    "isSymbolicStmts"      -> DzKLabel
-    "#symStmts"      -> DzKLabel
-    "isRenameColumnAttribute"      -> DzKLabel
-    "isSymbolicRenameColumnAttribute"      -> DzKLabel
-    "#symRenameColumnAttribute"      -> DzKLabel
     "isMyMap"      -> DzKLabel
     "isSymbolicMyMap"      -> DzKLabel
     "#symMyMap"      -> DzKLabel
-    "isAttribute"      -> DzKLabel
-    "isSymbolicAttribute"      -> DzKLabel
-    "#symAttribute"      -> DzKLabel
-    "isAddAttributes"      -> DzKLabel
-    "isSymbolicAddAttributes"      -> DzKLabel
-    "#symAddAttributes"      -> DzKLabel
     "isAttributes"      -> DzKLabel
     "isSymbolicAttributes"      -> DzKLabel
     "#symAttributes"      -> DzKLabel
     "isValues"      -> DzKLabel
     "isSymbolicValues"      -> DzKLabel
     "#symValues"      -> DzKLabel
-    "isSymbolicK"      -> DzKLabel
-    "#symK"      -> DzKLabel
     "isString"      -> DzKLabel
     "isSymbolicString"      -> DzKLabel
     "#symString"      -> DzKLabel
-    "isInt"      -> DzKLabel
-    "isSymbolicInt"      -> DzKLabel
-    "#symInt"      -> DzKLabel
-    "isStmt"      -> DzKLabel
-    "isSymbolicStmt"      -> DzKLabel
-    "#symStmt"      -> DzKLabel
     "isDropAttributes"      -> DzKLabel
     "isSymbolicDropAttributes"      -> DzKLabel
     "#symDropAttributes"      -> DzKLabel
     "isBool"      -> DzKLabel
     "isSymbolicBool"      -> DzKLabel
     "#symBool"      -> DzKLabel
-    "isChar"      -> DzKLabel
-    "isSymbolicChar"      -> DzKLabel
-    "#symChar"      -> DzKLabel
-    "isTables"      -> DzKLabel
-    "isSymbolicTables"      -> DzKLabel
-    "#symTables"      -> DzKLabel
     "isStream"      -> DzKLabel
     "isSymbolicStream"      -> DzKLabel
     "#symStream"      -> DzKLabel
-    "isTCPAnswer"      -> DzKLabel
-    "isSymbolicTCPAnswer"      -> DzKLabel
-    "#symTCPAnswer"      -> DzKLabel
-    "is#Int"      -> DzKLabel
-    "isRenameColumnAttributes"      -> DzKLabel
-    "isSymbolicRenameColumnAttributes"      -> DzKLabel
-    "#symRenameColumnAttributes"      -> DzKLabel
     "is#String"      -> DzKLabel
     "is#Bool"      -> DzKLabel
     "isDropAttribute"      -> DzKLabel
@@ -976,36 +949,15 @@ lexical syntax
     "isAlterCommands"      -> DzKLabel
     "isSymbolicAlterCommands"      -> DzKLabel
     "#symAlterCommands"      -> DzKLabel
-    "isMyBag"      -> DzKLabel
-    "isSymbolicMyBag"      -> DzKLabel
-    "#symMyBag"      -> DzKLabel
-    "isColumns"      -> DzKLabel
-    "isSymbolicColumns"      -> DzKLabel
-    "#symColumns"      -> DzKLabel
-    "isTCPError"      -> DzKLabel
-    "isSymbolicTCPError"      -> DzKLabel
-    "#symTCPError"      -> DzKLabel
-    "isKResult"      -> DzKLabel
-    "isSymbolicKResult"      -> DzKLabel
-    "#symKResult"      -> DzKLabel
     "isDrop"      -> DzKLabel
     "isSymbolicDrop"      -> DzKLabel
     "#symDrop"      -> DzKLabel
     "isFloat"      -> DzKLabel
     "isSymbolicFloat"      -> DzKLabel
     "#symFloat"      -> DzKLabel
-    "isType"      -> DzKLabel
-    "isSymbolicType"      -> DzKLabel
-    "#symType"      -> DzKLabel
     "isRenameTable"      -> DzKLabel
     "isSymbolicRenameTable"      -> DzKLabel
     "#symRenameTable"      -> DzKLabel
-    "isAlterCommand"      -> DzKLabel
-    "isSymbolicAlterCommand"      -> DzKLabel
-    "#symAlterCommand"      -> DzKLabel
-    "isCommand"      -> DzKLabel
-    "isSymbolicCommand"      -> DzKLabel
-    "#symCommand"      -> DzKLabel
     "isMyList"      -> DzKLabel
     "isSymbolicMyList"      -> DzKLabel
     "#symMyList"      -> DzKLabel
@@ -1018,6 +970,69 @@ lexical syntax
     "isSymbolicKItem"      -> DzKLabel
     "#symKItem"      -> DzKLabel
     "is#Float"      -> DzKLabel
+    "isAddAttribute"      -> DzKLabel
+    "isSymbolicAddAttribute"      -> DzKLabel
+    "#symAddAttribute"      -> DzKLabel
+    "isVariable"      -> DzKLabel
+    "isSymbolicVariable"      -> DzKLabel
+    "#symVariable"      -> DzKLabel
+    "isStmts"      -> DzKLabel
+    "isSymbolicStmts"      -> DzKLabel
+    "#symStmts"      -> DzKLabel
+    "isRenameColumnAttribute"      -> DzKLabel
+    "isSymbolicRenameColumnAttribute"      -> DzKLabel
+    "#symRenameColumnAttribute"      -> DzKLabel
+    "isAttribute"      -> DzKLabel
+    "isSymbolicAttribute"      -> DzKLabel
+    "#symAttribute"      -> DzKLabel
+    "isAddAttributes"      -> DzKLabel
+    "isSymbolicAddAttributes"      -> DzKLabel
+    "#symAddAttributes"      -> DzKLabel
+    "isSymbolicK"      -> DzKLabel
+    "#symK"      -> DzKLabel
+    "isInt"      -> DzKLabel
+    "isSymbolicInt"      -> DzKLabel
+    "#symInt"      -> DzKLabel
+    "isStmt"      -> DzKLabel
+    "isSymbolicStmt"      -> DzKLabel
+    "#symStmt"      -> DzKLabel
+    "isColumn"      -> DzKLabel
+    "isSymbolicColumn"      -> DzKLabel
+    "#symColumn"      -> DzKLabel
+    "isChar"      -> DzKLabel
+    "isSymbolicChar"      -> DzKLabel
+    "#symChar"      -> DzKLabel
+    "isTables"      -> DzKLabel
+    "isSymbolicTables"      -> DzKLabel
+    "#symTables"      -> DzKLabel
+    "isTCPAnswer"      -> DzKLabel
+    "isSymbolicTCPAnswer"      -> DzKLabel
+    "#symTCPAnswer"      -> DzKLabel
+    "is#Int"      -> DzKLabel
+    "isRenameColumnAttributes"      -> DzKLabel
+    "isSymbolicRenameColumnAttributes"      -> DzKLabel
+    "#symRenameColumnAttributes"      -> DzKLabel
+    "isMyBag"      -> DzKLabel
+    "isSymbolicMyBag"      -> DzKLabel
+    "#symMyBag"      -> DzKLabel
+    "isColumns"      -> DzKLabel
+    "isSymbolicColumns"      -> DzKLabel
+    "#symColumns"      -> DzKLabel
+    "isTCPError"      -> DzKLabel
+    "isSymbolicTCPError"      -> DzKLabel
+    "#symTCPError"      -> DzKLabel
+    "isKResult"      -> DzKLabel
+    "isSymbolicKResult"      -> DzKLabel
+    "#symKResult"      -> DzKLabel
+    "isType"      -> DzKLabel
+    "isSymbolicType"      -> DzKLabel
+    "#symType"      -> DzKLabel
+    "isAlterCommand"      -> DzKLabel
+    "isSymbolicAlterCommand"      -> DzKLabel
+    "#symAlterCommand"      -> DzKLabel
+    "isCommand"      -> DzKLabel
+    "isSymbolicCommand"      -> DzKLabel
+    "#symCommand"      -> DzKLabel
 
 
 

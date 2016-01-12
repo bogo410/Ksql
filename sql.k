@@ -76,7 +76,7 @@ module SQL
 									<table-name color="blue"> .Set </table-name>
 									<schema color="Orchid"> .Map </schema>
 									<values multiplicity="*" color="gray">
-										<value color="black"> .Map </value>
+										<value color="black" current="false"> .Map </value>
 									</values>
 								</table>
 							</tables> 
@@ -98,7 +98,7 @@ rule <k> CREATE TABLE N:Id (A:Attributes) ; => ADD SCHEMA N ( A ) ; ... </k>
                	<table-name> SetItem(N) </table-name>
                	<schema> .Map </schema>
                	<values>
-					<value> .Map </value>
+					.Bag//<value> .Map </value>
 				 </values>
          ... </table> )
 
@@ -157,13 +157,19 @@ rule <k> DROP TABLE N:Id ; => .K ... </k>
 //(lista vuota)
 rule <k> DROP TABLE .Tables ; => .K ... </k>
 
+
 // ------ INSERT INTO ------- //
-rule <k> INSERT INTO N:Id ( A:Id ) VALUES ( V:Value ) ; => .K ... </k>
+rule <k> INSERT INTO N:Id ( C:Id ) VALUES ( V:Value ) ; => .K ... </k>
 	<table-name> SetItem(N) </table-name>
 //    <schema> M:Map </schema>
-//	<values>...	
-		<value> M:Map => M [V / A] </value>
-//	... </values>
+	<values>...	
+		//<value> M:Map => M[ C / V ] </value>
+		. => <value current="true"> C |-> V </value>
+	... </values>
+
+	/*
+poi da solo . => <value current="true"> Map </value> => <value current="false"> Map </value>
+	*/
 /*
     	<value> M:Map => M |-> MM:Map[V / A] </value>
 */
