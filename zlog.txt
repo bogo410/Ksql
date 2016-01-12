@@ -7,7 +7,7 @@ ALTER TABLE name action [, ... ]
 where action is one of:
 
     ADD [ COLUMN ] column data_type 											OK
-    DROP [ COLUMN ] [ IF EXISTS ] column 										OK (DROP IF EXISTS DROP 																		COLUMN IF EXISTS ?????)
+    DROP [ COLUMN ] [ IF EXISTS ] column 										OK
     RENAME [ COLUMN ] column TO new_column										OK
     RENAME TO new_name															OK
     SET SCHEMA new_schema
@@ -16,6 +16,11 @@ where action is one of:
     ALTER [ COLUMN ] column { SET | DROP } NOT NULL
     ALTER [ COLUMN ] column SET ( attribute_option = value [, ... ] )
 
+// ---- INSERT INTO ---- //
+
+INSERT INTO table [( column [, ... ] ) ]
+	{ ( values [, ... ] }
+	
 
  //sono comandi avanzati non so se bisogna farli
  "alter table nometable alter column nomecolonna set default
@@ -31,4 +36,4 @@ where action is one of:
 
 
 // ---- PROBLEMI DEL FILE CORRENTE .K ---- //
-//1. DROP TABLE non funziona
+//DROP e ADD non si possono fare assieme

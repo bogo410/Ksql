@@ -6,21 +6,23 @@ exports
 
 context-free syntax
 context-free start-symbols
-Add AddAttribute Stmts RenameColumnAttribute Attribute AddAttributes Attributes String Int Stmt DdropAttributes Bool Tables DzInt RenameColumnAttributes DzString DzBool DdropAttribute AlterCommands Ddrop Float Type RenameTable AlterCommand Command Id DzFloat K
+Add AddAttribute Stmts RenameColumnAttribute Attribute AddAttributes Attributes Values String Int Stmt DdropAttributes Bool Tables DzInt RenameColumnAttributes DzString DzBool DdropAttribute AlterCommands Columns Ddrop Float Type RenameTable AlterCommand Command Value Id DzFloat K
 context-free syntax
     "CREATE DATABASE" InsertDzId ";" -> Stmt {cons("Stmt1440Syn")}
-    "ADD" -> Add {cons("Add1450Syn")}
+    "ADD" -> Add {cons("Add1453Syn")}
     {AlterCommand ","}* -> AlterCommands {cons("AlterCommands1ListSyn")}
-    "SMALLINT" -> Type {cons("Type1447Syn")}
-    "RENAME TO" Id -> RenameTable {cons("RenameTable1460Syn")}
+    "SMALLINT" -> Type {cons("Type1448Syn")}
+    "RENAME TO" Id -> RenameTable {cons("RenameTable1463Syn")}
     DzInt -> Int {}
-    Stmt Stmts -> Stmts {cons("Stmts1445Syn")}
-    "DROP COLUMN IF EXISTS" -> Ddrop {cons("Ddrop1457Syn")}
+    Stmt Stmts -> Stmts {cons("Stmts1446Syn")}
+    "DROP COLUMN IF EXISTS" -> Ddrop {cons("Ddrop1459Syn")}
+    Int -> Value {}
+    {Value ","}* -> Values {cons("Values1ListSyn")}
     AddAttribute -> AlterCommand {}
-    Add Attribute -> AddAttribute {cons("AddAttribute1453Syn")}
-    "DROP COLUMN" -> Ddrop {cons("Ddrop1455Syn")}
-    "DROP IF EXISTS" -> Ddrop {cons("Ddrop1456Syn")}
-    Ddrop Id -> DdropAttribute {cons("DdropAttribute1458Syn")}
+    Add Attribute -> AddAttribute {cons("AddAttribute1455Syn")}
+    "DROP COLUMN" -> Ddrop {cons("Ddrop1457Syn")}
+    "DROP IF EXISTS" -> Ddrop {cons("Ddrop1458Syn")}
+    Ddrop Id -> DdropAttribute {cons("DdropAttribute1460Syn")}
     DzBool -> Bool {}
     "DROP TABLE" InsertDzTables ";" -> Stmt {cons("Stmt1444Syn")}
     Stmt -> Stmts {}
@@ -29,23 +31,29 @@ context-free syntax
     DzFloat -> Float {}
     {Attribute ","}* -> Attributes {cons("Attributes1ListSyn")}
     {AddAttribute ","}* -> AddAttributes {cons("AddAttributes1ListSyn")}
-    "RENAME COLUMN" InsertDzId "TO" Id -> RenameColumnAttribute {cons("RenameColumnAttribute1459Syn")}
-    "ADD COLUMN" -> Add {cons("Add1452Syn")}
+    "RENAME COLUMN" InsertDzId "TO" Id -> RenameColumnAttribute {cons("RenameColumnAttribute1462Syn")}
+    "ADD COLUMN" -> Add {cons("Add1454Syn")}
     DzString -> String {}
     "CREATE TABLE" InsertDzId "(" InsertDzAttributes ")" ";" -> Stmt {cons("Stmt1442Syn")}
-    Id Type -> Attribute {cons("Attribute1449Syn")}
+    Id Type -> Attribute {cons("Attribute1450Syn")}
+    {Id ","}* -> Columns {cons("Columns1ListSyn")}
     {Id ","}* -> Tables {cons("Tables1ListSyn")}
     RenameColumnAttribute -> AlterCommand {}
     DdropAttribute -> AlterCommand {}
-    "ADD SCHEMA" InsertDzId "(" InsertDzAttributes ")" ";" -> Command {cons("Command1448Syn")}
-    "VARCHAR" -> Type {cons("Type1446Syn")}
+    "'" InsertDzString "'" -> Value {cons("Value1452Syn")}
+    "ADD SCHEMA" InsertDzId "(" InsertDzAttributes ")" ";" -> Command {cons("Command1449Syn")}
+    "INSERT INTO" InsertDzId "(" InsertDzColumns ")" "VALUES" "(" InsertDzValues ")" ";" -> Stmt {cons("Stmt1445Syn")}
+    "VARCHAR" -> Type {cons("Type1447Syn")}
     {DdropAttribute ","}* -> DdropAttributes {cons("DdropAttributes1ListSyn")}
-    "DROP" -> Ddrop {cons("Ddrop1454Syn")}
+    "DROP" -> Ddrop {cons("Ddrop1456Syn")}
     "ALTER TABLE" InsertDzId InsertDzAlterCommands ";" -> Stmt {cons("Stmt1443Syn")}
     AlterCommands -> InsertDzAlterCommands
     Attributes -> InsertDzAttributes
+    Values -> InsertDzValues
     Tables -> InsertDzTables
+    Columns -> InsertDzColumns
     Id -> InsertDzId
+    String -> InsertDzString
 
 
     DzDzString        -> DzString    {cons("DzString1Const")}
@@ -77,6 +85,7 @@ context-free syntax
     RenameTable        -> K
     AlterCommand        -> K
     Command        -> K
+    Value        -> K
     Id        -> K
     DzFloat        -> K
 lexical syntax
@@ -85,8 +94,9 @@ lexical syntax
 
 
     "ADD" -> IdDz {reject}
-    "false" -> IdDz {reject}
     "DROP" -> IdDz {reject}
+    "VALUES" -> IdDz {reject}
+    "false" -> IdDz {reject}
     "SMALLINT" -> IdDz {reject}
     "true" -> IdDz {reject}
     "VARCHAR" -> IdDz {reject}
@@ -102,20 +112,23 @@ lexical syntax
     [\+\-]?[0-9]+"."[0-9]+([eE][\+\-]?[0-9]+)?[fFdD]? -> DzFloatDz
     "\"" ((~[\"\n\r\\])|(((([\\][nrtf\"\\])|([\\][x][0-9a-fA-F][0-9a-fA-F]))|([\\][u][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]))|([\\][U][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])))*"\"" -> DzStringDz
     "ADD" -> DzStringDz {reject}
+    "CREATE DATABASE" -> DzStringDz {reject}
+    "DROP TABLE" -> DzStringDz {reject}
+    "DROP" -> DzStringDz {reject}
+    "INSERT INTO" -> DzStringDz {reject}
+    "RENAME TO" -> DzStringDz {reject}
+    "ALTER TABLE" -> DzStringDz {reject}
+    "VALUES" -> DzStringDz {reject}
     "DROP IF EXISTS" -> DzStringDz {reject}
+    "'" -> DzStringDz {reject}
     "false" -> DzStringDz {reject}
     "(" -> DzStringDz {reject}
-    "CREATE DATABASE" -> DzStringDz {reject}
     ")" -> DzStringDz {reject}
     "ADD COLUMN" -> DzStringDz {reject}
-    "DROP TABLE" -> DzStringDz {reject}
     "," -> DzStringDz {reject}
-    "DROP" -> DzStringDz {reject}
     "RENAME COLUMN" -> DzStringDz {reject}
     "SMALLINT" -> DzStringDz {reject}
-    "RENAME TO" -> DzStringDz {reject}
     "true" -> DzStringDz {reject}
-    "ALTER TABLE" -> DzStringDz {reject}
     "VARCHAR" -> DzStringDz {reject}
     ";" -> DzStringDz {reject}
     "TO" -> DzStringDz {reject}
@@ -124,20 +137,23 @@ lexical syntax
     "ADD SCHEMA" -> DzStringDz {reject}
     "CREATE TABLE" -> DzStringDz {reject}
     "ADD" -> IdDz {reject}
+    "CREATE DATABASE" -> IdDz {reject}
+    "DROP TABLE" -> IdDz {reject}
+    "DROP" -> IdDz {reject}
+    "INSERT INTO" -> IdDz {reject}
+    "RENAME TO" -> IdDz {reject}
+    "ALTER TABLE" -> IdDz {reject}
+    "VALUES" -> IdDz {reject}
     "DROP IF EXISTS" -> IdDz {reject}
+    "'" -> IdDz {reject}
     "false" -> IdDz {reject}
     "(" -> IdDz {reject}
-    "CREATE DATABASE" -> IdDz {reject}
     ")" -> IdDz {reject}
     "ADD COLUMN" -> IdDz {reject}
-    "DROP TABLE" -> IdDz {reject}
     "," -> IdDz {reject}
-    "DROP" -> IdDz {reject}
     "RENAME COLUMN" -> IdDz {reject}
     "SMALLINT" -> IdDz {reject}
-    "RENAME TO" -> IdDz {reject}
     "true" -> IdDz {reject}
-    "ALTER TABLE" -> IdDz {reject}
     "VARCHAR" -> IdDz {reject}
     ";" -> IdDz {reject}
     "TO" -> IdDz {reject}
@@ -146,20 +162,23 @@ lexical syntax
     "ADD SCHEMA" -> IdDz {reject}
     "CREATE TABLE" -> IdDz {reject}
     "ADD" -> DzIntDz {reject}
+    "CREATE DATABASE" -> DzIntDz {reject}
+    "DROP TABLE" -> DzIntDz {reject}
+    "DROP" -> DzIntDz {reject}
+    "INSERT INTO" -> DzIntDz {reject}
+    "RENAME TO" -> DzIntDz {reject}
+    "ALTER TABLE" -> DzIntDz {reject}
+    "VALUES" -> DzIntDz {reject}
     "DROP IF EXISTS" -> DzIntDz {reject}
+    "'" -> DzIntDz {reject}
     "false" -> DzIntDz {reject}
     "(" -> DzIntDz {reject}
-    "CREATE DATABASE" -> DzIntDz {reject}
     ")" -> DzIntDz {reject}
     "ADD COLUMN" -> DzIntDz {reject}
-    "DROP TABLE" -> DzIntDz {reject}
     "," -> DzIntDz {reject}
-    "DROP" -> DzIntDz {reject}
     "RENAME COLUMN" -> DzIntDz {reject}
     "SMALLINT" -> DzIntDz {reject}
-    "RENAME TO" -> DzIntDz {reject}
     "true" -> DzIntDz {reject}
-    "ALTER TABLE" -> DzIntDz {reject}
     "VARCHAR" -> DzIntDz {reject}
     ";" -> DzIntDz {reject}
     "TO" -> DzIntDz {reject}
@@ -168,20 +187,23 @@ lexical syntax
     "ADD SCHEMA" -> DzIntDz {reject}
     "CREATE TABLE" -> DzIntDz {reject}
     "ADD" -> DzFloatDz {reject}
+    "CREATE DATABASE" -> DzFloatDz {reject}
+    "DROP TABLE" -> DzFloatDz {reject}
+    "DROP" -> DzFloatDz {reject}
+    "INSERT INTO" -> DzFloatDz {reject}
+    "RENAME TO" -> DzFloatDz {reject}
+    "ALTER TABLE" -> DzFloatDz {reject}
+    "VALUES" -> DzFloatDz {reject}
     "DROP IF EXISTS" -> DzFloatDz {reject}
+    "'" -> DzFloatDz {reject}
     "false" -> DzFloatDz {reject}
     "(" -> DzFloatDz {reject}
-    "CREATE DATABASE" -> DzFloatDz {reject}
     ")" -> DzFloatDz {reject}
     "ADD COLUMN" -> DzFloatDz {reject}
-    "DROP TABLE" -> DzFloatDz {reject}
     "," -> DzFloatDz {reject}
-    "DROP" -> DzFloatDz {reject}
     "RENAME COLUMN" -> DzFloatDz {reject}
     "SMALLINT" -> DzFloatDz {reject}
-    "RENAME TO" -> DzFloatDz {reject}
     "true" -> DzFloatDz {reject}
-    "ALTER TABLE" -> DzFloatDz {reject}
     "VARCHAR" -> DzFloatDz {reject}
     ";" -> DzFloatDz {reject}
     "TO" -> DzFloatDz {reject}
