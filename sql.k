@@ -8,7 +8,8 @@ syntax Stmt ::=	"CREATE DATABASE" Id ";"
 			|	"CREATE TABLE" Id "(" Attributes ")" ";"
 			|	"ALTER TABLE" Id AlterCommands ";"
 			|	"DROP TABLE" Tables ";"
-			|	"INSERT INTO" Id "(" Columns ")" "VALUES" "(" Values ")" ";"
+//			|	"INSERT INTO" Id "(" Columns ")" "VALUES" "(" Values ")" ";"
+			|	"INSERT INTO" Id "(" Id ")" "VALUES" "(" Value ")" ";"
 
 syntax Stmts ::= 	Stmt
 				|	Stmt Stmts
@@ -24,10 +25,10 @@ syntax Attribute ::= 	Id Type
 syntax Attributes ::= 	List{Attribute,","}
 
 syntax Column ::= 	Id	
-syntax Columns ::= 	List{Attribute,","}
+syntax Columns ::= 	List{Column,","}
 
 syntax Value ::= Int
-				| "'" Id "'"
+				| "'" String "'"
 syntax Values ::= List{Value,","}
 
 syntax Add ::=	"ADD"	
@@ -94,9 +95,11 @@ rule <k> CREATE DATABASE N:Id ; => .K ... </k>
 //crea la tabella senza attributi
 rule <k> CREATE TABLE N:Id (A:Attributes) ; => ADD SCHEMA N ( A ) ; ... </k>
        ( . => <table>...
-               <table-name> SetItem(N) </table-name>
-               <schema> .Map </schema>
-               <values> .Bag </values>
+               	<table-name> SetItem(N) </table-name>
+               	<schema> .Map </schema>
+               	<values>
+					<value> .Map </value>
+				 </values>
          ... </table> )
 
 //comando di supporto: aggiunge gli attributi alla tabella
@@ -154,11 +157,14 @@ rule <k> DROP TABLE N:Id ; => .K ... </k>
 //(lista vuota)
 rule <k> DROP TABLE .Tables ; => .K ... </k>
 
-// ------ INSERT INTO ------- // 
-rule <k> INSERT INTO N:Id (I:Id , C:Columns) VALUES (V:Value , W:Values) ; ... => INSERT INTO N ( C ) VALUES ( W ) ; ... </k>
-	(
-		
-	)
-
-
+// ------ INSERT INTO ------- //
+rule <k> INSERT INTO N:Id ( A:Id ) VALUES ( V:Value ) ; => .K ... </k>
+	<table-name> SetItem(N) </table-name>
+//    <schema> M:Map </schema>
+//	<values>...	
+		<value> M:Map => M [V / A] </value>
+//	... </values>
+/*
+    	<value> M:Map => M |-> MM:Map[V / A] </value>
+*/
 endmodule
