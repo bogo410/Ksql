@@ -9,7 +9,6 @@ syntax Stmt ::=	"CREATE DATABASE" Id ";"
 			|	"ALTER TABLE" Id AlterCommands ";"
 			|	"DROP TABLE" Tables ";"
 			|	"INSERT INTO" Id "(" Columns ")" "VALUES" "(" Values ")" ";"
-//			|	"INSERT INTO" Id "(" Id ")" "VALUES" "(" Value ")" ";" //Singola
 
 syntax Stmts ::= 	Stmt
 				|	Stmt Stmts
@@ -55,11 +54,6 @@ syntax AlterCommand ::=	AddAttribute
 					|	RenameColumnAttribute
 					|	RenameTable
 syntax AlterCommands ::=	List{AlterCommand,","}
-
-//syntax OpCodes ::= "ADD" Id | "ADD COLUMN" Id | "DROP COLUMN" Id | "RENAME TO" Id | "RENAME COLUMN" Id "TO" Id
-//syntax OpCodess ::= List{OpCodes,","}
-//non so se questo sopra è giusto ma per poter fare un uso casuale di queste queary dobbiamo unirle tutte
-//un uso simile lo ho trovato nel file /K/samples/wcet/wcet.k (su dropbox)
 
 endmodule
 
@@ -157,12 +151,6 @@ rule <k> DROP TABLE N:Id ; => .K ... </k>
 //(lista vuota)
 rule <k> DROP TABLE .Tables ; => .K ... </k>
 
-/*// ------ INSERT INTO ------- // Singola
-rule <k> INSERT INTO N:Id ( C:Id ) VALUES ( V:Value ) ; => .K ... </k>
-	<table-name> SetItem(N) </table-name>
-	<values>...	
-		. => <value> C |-> V </value>	
-	... </values>*/
 // ------ INSERT INTO ------- // 
 rule <k> INSERT INTO N:Id ( C:Column , S:Columns => S ) VALUES ( V:Value , W:Values => W ) ; ... </k>
 	<table-name> SetItem(N) </table-name>
@@ -179,5 +167,5 @@ rule <k> INSERT INTO N:Id ( .Columns ) VALUES ( .Values ) ; => .K ... </k>
 
 
 
-//		<value> M:Map => M [V / C] </value> //non va bene perchè aggiorno e non aggiungo una nuova tupla (va bene per l'UPDATE)
+//		<value> M:Map => M [C <- V] </value> //non va bene perchè aggiorno e non aggiungo una nuova tupla (va bene per l'UPDATE)
 endmodule
