@@ -1,5 +1,0 @@
-//prova.sql
-
-CREATE DATABASE Spy; 
-CREATE TABLE Students(Id SMALLINT, Name VARCHAR, Surname VARCHAR, Anno SMALLINT);
-
