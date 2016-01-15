@@ -1,0 +1,8 @@
+//prova.sql
+
+CREATE DATABASE Spy; 
+CREATE TABLE Student();
+CREATE TABLE Students(Id SMALLINT, Name VARCHAR, Surname VARCHAR);
+ALTER TABLE Student ADD Anno SMALLINT;
+ALTER TABLE Students ADD Anno SMALLINT;
+

@@ -1,0 +1,224 @@
+module Program
+
+imports Common
+imports KBuiltinsBasic
+exports
+
+context-free syntax
+context-free start-symbols
+Add AddAttribute Stmts RenameColumnAttribute Attribute AddAttributes Attributes Values String Int Stmt DdropAttributes Bool Column Tables DzInt RenameColumnAttributes DzString DzBool DdropAttribute AlterCommands Columns Ddrop Float Type RenameTable AlterCommand Command Value Id DzFloat K
+context-free syntax
+    "CREATE DATABASE" InsertDzId ";" -> Stmt {cons("Stmt1440Syn")}
+    "ADD" -> Add {cons("Add1453Syn")}
+    {AlterCommand ","}* -> AlterCommands {cons("AlterCommands1ListSyn")}
+    "SMALLINT" -> Type {cons("Type1448Syn")}
+    "RENAME TO" Id -> RenameTable {cons("RenameTable1463Syn")}
+    DzInt -> Int {}
+    Stmt Stmts -> Stmts {cons("Stmts1446Syn")}
+    "DROP COLUMN IF EXISTS" -> Ddrop {cons("Ddrop1459Syn")}
+    Int -> Value {}
+    {Value ","}* -> Values {cons("Values1ListSyn")}
+    AddAttribute -> AlterCommand {}
+    Add Attribute -> AddAttribute {cons("AddAttribute1455Syn")}
+    "DROP COLUMN" -> Ddrop {cons("Ddrop1457Syn")}
+    "DROP IF EXISTS" -> Ddrop {cons("Ddrop1458Syn")}
+    Id -> Column {}
+    Ddrop Id -> DdropAttribute {cons("DdropAttribute1460Syn")}
+    DzBool -> Bool {}
+    "DROP TABLE" InsertDzTables ";" -> Stmt {cons("Stmt1444Syn")}
+    Stmt -> Stmts {}
+    {RenameColumnAttribute ","}* -> RenameColumnAttributes {cons("RenameColumnAttributes1ListSyn")}
+    RenameTable -> AlterCommand {}
+    DzFloat -> Float {}
+    {Attribute ","}* -> Attributes {cons("Attributes1ListSyn")}
+    {AddAttribute ","}* -> AddAttributes {cons("AddAttributes1ListSyn")}
+    "INSERT INTO" InsertDzId "(" InsertDzId ")" "VALUES" "(" InsertDzValue ")" ";" -> Stmt {cons("Stmt1445Syn")}
+    {Column ","}* -> Columns {cons("Columns1ListSyn")}
+    "RENAME COLUMN" InsertDzId "TO" Id -> RenameColumnAttribute {cons("RenameColumnAttribute1462Syn")}
+    "ADD COLUMN" -> Add {cons("Add1454Syn")}
+    DzString -> String {}
+    "CREATE TABLE" InsertDzId "(" InsertDzAttributes ")" ";" -> Stmt {cons("Stmt1442Syn")}
+    Id Type -> Attribute {cons("Attribute1450Syn")}
+    {Id ","}* -> Tables {cons("Tables1ListSyn")}
+    RenameColumnAttribute -> AlterCommand {}
+    DdropAttribute -> AlterCommand {}
+    "'" InsertDzString "'" -> Value {cons("Value1452Syn")}
+    "ADD SCHEMA" InsertDzId "(" InsertDzAttributes ")" ";" -> Command {cons("Command1449Syn")}
+    "VARCHAR" -> Type {cons("Type1447Syn")}
+    {DdropAttribute ","}* -> DdropAttributes {cons("DdropAttributes1ListSyn")}
+    "DROP" -> Ddrop {cons("Ddrop1456Syn")}
+    "ALTER TABLE" InsertDzId InsertDzAlterCommands ";" -> Stmt {cons("Stmt1443Syn")}
+    AlterCommands -> InsertDzAlterCommands
+    Value -> InsertDzValue
+    Attributes -> InsertDzAttributes
+    Tables -> InsertDzTables
+    Id -> InsertDzId
+    String -> InsertDzString
+
+
+    DzDzString        -> DzString    {cons("DzString1Const")}
+    DzDzBool        -> DzBool    {cons("DzBool1Const")}
+    DzDzInt        -> DzInt    {cons("DzInt1Const")}
+    DzDzId        -> DzId    {cons("DzId1Const")}
+    DzDzFloat        -> DzFloat    {cons("DzFloat1Const")}
+
+
+
+%% start symbols subsorts
+    KItem        -> K
+    Add        -> K
+    AddAttribute        -> K
+    Stmts        -> K
+    RenameColumnAttribute        -> K
+    Attribute        -> K
+    String        -> K
+    Int        -> K
+    Stmt        -> K
+    Bool        -> K
+    Column        -> K
+    DzInt        -> K
+    DzString        -> K
+    DzBool        -> K
+    DdropAttribute        -> K
+    Ddrop        -> K
+    Float        -> K
+    Type        -> K
+    RenameTable        -> K
+    AlterCommand        -> K
+    Command        -> K
+    Value        -> K
+    Id        -> K
+    DzFloat        -> K
+lexical syntax
+    "false" -> DzDzBool
+    "true" -> DzDzBool
+
+
+    "ADD" -> IdDz {reject}
+    "DROP" -> IdDz {reject}
+    "VALUES" -> IdDz {reject}
+    "false" -> IdDz {reject}
+    "SMALLINT" -> IdDz {reject}
+    "true" -> IdDz {reject}
+    "VARCHAR" -> IdDz {reject}
+    "TO" -> IdDz {reject}
+
+lexical restrictions
+    %% follow restrictions
+
+
+lexical syntax
+    [A-Za-z\_][A-Za-z0-9\_]* -> IdDz
+    [\-\+]?[0-9]+ -> DzIntDz
+    [\+\-]?[0-9]+"."[0-9]+([eE][\+\-]?[0-9]+)?[fFdD]? -> DzFloatDz
+    "\"" ((~[\"\n\r\\])|(((([\\][nrtf\"\\])|([\\][x][0-9a-fA-F][0-9a-fA-F]))|([\\][u][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]))|([\\][U][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F])))*"\"" -> DzStringDz
+    "ADD" -> DzStringDz {reject}
+    "CREATE DATABASE" -> DzStringDz {reject}
+    "DROP TABLE" -> DzStringDz {reject}
+    "DROP" -> DzStringDz {reject}
+    "INSERT INTO" -> DzStringDz {reject}
+    "RENAME TO" -> DzStringDz {reject}
+    "ALTER TABLE" -> DzStringDz {reject}
+    "VALUES" -> DzStringDz {reject}
+    "DROP IF EXISTS" -> DzStringDz {reject}
+    "'" -> DzStringDz {reject}
+    "false" -> DzStringDz {reject}
+    "(" -> DzStringDz {reject}
+    ")" -> DzStringDz {reject}
+    "ADD COLUMN" -> DzStringDz {reject}
+    "," -> DzStringDz {reject}
+    "RENAME COLUMN" -> DzStringDz {reject}
+    "SMALLINT" -> DzStringDz {reject}
+    "true" -> DzStringDz {reject}
+    "VARCHAR" -> DzStringDz {reject}
+    ";" -> DzStringDz {reject}
+    "TO" -> DzStringDz {reject}
+    "DROP COLUMN" -> DzStringDz {reject}
+    "DROP COLUMN IF EXISTS" -> DzStringDz {reject}
+    "ADD SCHEMA" -> DzStringDz {reject}
+    "CREATE TABLE" -> DzStringDz {reject}
+    "ADD" -> IdDz {reject}
+    "CREATE DATABASE" -> IdDz {reject}
+    "DROP TABLE" -> IdDz {reject}
+    "DROP" -> IdDz {reject}
+    "INSERT INTO" -> IdDz {reject}
+    "RENAME TO" -> IdDz {reject}
+    "ALTER TABLE" -> IdDz {reject}
+    "VALUES" -> IdDz {reject}
+    "DROP IF EXISTS" -> IdDz {reject}
+    "'" -> IdDz {reject}
+    "false" -> IdDz {reject}
+    "(" -> IdDz {reject}
+    ")" -> IdDz {reject}
+    "ADD COLUMN" -> IdDz {reject}
+    "," -> IdDz {reject}
+    "RENAME COLUMN" -> IdDz {reject}
+    "SMALLINT" -> IdDz {reject}
+    "true" -> IdDz {reject}
+    "VARCHAR" -> IdDz {reject}
+    ";" -> IdDz {reject}
+    "TO" -> IdDz {reject}
+    "DROP COLUMN" -> IdDz {reject}
+    "DROP COLUMN IF EXISTS" -> IdDz {reject}
+    "ADD SCHEMA" -> IdDz {reject}
+    "CREATE TABLE" -> IdDz {reject}
+    "ADD" -> DzIntDz {reject}
+    "CREATE DATABASE" -> DzIntDz {reject}
+    "DROP TABLE" -> DzIntDz {reject}
+    "DROP" -> DzIntDz {reject}
+    "INSERT INTO" -> DzIntDz {reject}
+    "RENAME TO" -> DzIntDz {reject}
+    "ALTER TABLE" -> DzIntDz {reject}
+    "VALUES" -> DzIntDz {reject}
+    "DROP IF EXISTS" -> DzIntDz {reject}
+    "'" -> DzIntDz {reject}
+    "false" -> DzIntDz {reject}
+    "(" -> DzIntDz {reject}
+    ")" -> DzIntDz {reject}
+    "ADD COLUMN" -> DzIntDz {reject}
+    "," -> DzIntDz {reject}
+    "RENAME COLUMN" -> DzIntDz {reject}
+    "SMALLINT" -> DzIntDz {reject}
+    "true" -> DzIntDz {reject}
+    "VARCHAR" -> DzIntDz {reject}
+    ";" -> DzIntDz {reject}
+    "TO" -> DzIntDz {reject}
+    "DROP COLUMN" -> DzIntDz {reject}
+    "DROP COLUMN IF EXISTS" -> DzIntDz {reject}
+    "ADD SCHEMA" -> DzIntDz {reject}
+    "CREATE TABLE" -> DzIntDz {reject}
+    "ADD" -> DzFloatDz {reject}
+    "CREATE DATABASE" -> DzFloatDz {reject}
+    "DROP TABLE" -> DzFloatDz {reject}
+    "DROP" -> DzFloatDz {reject}
+    "INSERT INTO" -> DzFloatDz {reject}
+    "RENAME TO" -> DzFloatDz {reject}
+    "ALTER TABLE" -> DzFloatDz {reject}
+    "VALUES" -> DzFloatDz {reject}
+    "DROP IF EXISTS" -> DzFloatDz {reject}
+    "'" -> DzFloatDz {reject}
+    "false" -> DzFloatDz {reject}
+    "(" -> DzFloatDz {reject}
+    ")" -> DzFloatDz {reject}
+    "ADD COLUMN" -> DzFloatDz {reject}
+    "," -> DzFloatDz {reject}
+    "RENAME COLUMN" -> DzFloatDz {reject}
+    "SMALLINT" -> DzFloatDz {reject}
+    "true" -> DzFloatDz {reject}
+    "VARCHAR" -> DzFloatDz {reject}
+    ";" -> DzFloatDz {reject}
+    "TO" -> DzFloatDz {reject}
+    "DROP COLUMN" -> DzFloatDz {reject}
+    "DROP COLUMN IF EXISTS" -> DzFloatDz {reject}
+    "ADD SCHEMA" -> DzFloatDz {reject}
+    "CREATE TABLE" -> DzFloatDz {reject}
+context-free syntax
+    DzStringDz -> DzString {cons("DzString1Const")}
+    IdDz -> Id {cons("Id1Const")}
+    DzIntDz -> DzInt {cons("DzInt1Const")}
+    DzFloatDz -> DzFloat {cons("DzFloat1Const")}
+
+
+context-free restrictions
+    Id -/- [A-Za-z0-9\_]
+    DzInt -/- [0-9]
