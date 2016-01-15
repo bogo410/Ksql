@@ -8,8 +8,8 @@ syntax Stmt ::=	"CREATE DATABASE" Id ";"
 			|	"CREATE TABLE" Id "(" Attributes ")" ";"
 			|	"ALTER TABLE" Id AlterCommands ";"
 			|	"DROP TABLE" Tables ";"
-//			|	"INSERT INTO" Id "(" Columns ")" "VALUES" "(" Values ")" ";"
-			|	"INSERT INTO" Id "(" Id ")" "VALUES" "(" Value ")" ";"
+			|	"INSERT INTO" Id "(" Columns ")" "VALUES" "(" Values ")" ";"
+//			|	"INSERT INTO" Id "(" Id ")" "VALUES" "(" Value ")" ";" //Singola
 
 syntax Stmts ::= 	Stmt
 				|	Stmt Stmts
@@ -76,7 +76,7 @@ module SQL
 									<table-name color="blue"> .Set </table-name>
 									<schema color="Orchid"> .Map </schema>
 									<values multiplicity="*" color="gray">
-										<value color="black" current="false"> .Map </value>
+										<value color="black"> .Map </value>
 									</values>
 								</table>
 							</tables> 
@@ -105,7 +105,7 @@ rule <k> CREATE TABLE N:Id (A:Attributes) ; => ADD SCHEMA N ( A ) ; ... </k>
 //comando di supporto: aggiunge gli attributi alla tabella
 rule <k> ADD SCHEMA N:Id ( X:Id T:Type , A:Attributes => A) ; ... </k>
 	<table-name> SetItem(N) </table-name>
-	<schema> M:Map => M[T / X] </schema>
+	<schema> M:Map => M[X <- T] </schema>
 
 //se gli attributi sono finiti consuma il comando( lo rimpiazza con .K cioè il comando vuoto di tipo K )
 rule <k> ADD SCHEMA N:Id ( .Attributes ) ; => .K ... </k>
@@ -114,12 +114,12 @@ rule <k> ADD SCHEMA N:Id ( .Attributes ) ; => .K ... </k>
 //aggiunge gli attributi alla tabella
 rule <k> ALTER TABLE N:Id ( Add X:Id T:Type , A:AddAttributes => A ); ... </k>
 	<table-name> SetItem(N) </table-name>
-	<schema> M:Map => M[T / X] </schema>
+	<schema> M:Map => M[X <- T] </schema>
 
 //se l'attributo è uno solo consuma il comando e aggiunge l'attributo
 rule <k> ( ALTER TABLE N:Id Add X:Id T:Type ; ) => .K ... </k>
 	<table-name> SetItem(N) </table-name>
-	<schema> M:Map => M[T / X] </schema>
+	<schema> M:Map => M[X <- T] </schema>
 
 rule <k> ALTER TABLE  N:Id .AddAttributes ; => .K ... </k>
 
@@ -138,7 +138,7 @@ rule <k> ALTER TABLE  N:Id .DropAttributes ; => .K ... </k>
 //rinomina la colonna in questione
 rule <k> ALTER TABLE N:Id RENAME COLUMN X:Id TO B:Id ; => .K ... </k>
 	<table-name> SetItem(N) </table-name>
-	<schema> M:Map X |-> T:Type => M[T / B] </schema>
+	<schema> M:Map X |-> T:Type => M[B <- T] </schema>
 
 // ------ ALTER TABLE RENAME TABLE ------- //
 rule <k> ALTER TABLE N:Id RENAME TO X:Id ; => .K ... </k>
@@ -157,20 +157,27 @@ rule <k> DROP TABLE N:Id ; => .K ... </k>
 //(lista vuota)
 rule <k> DROP TABLE .Tables ; => .K ... </k>
 
-
-// ------ INSERT INTO ------- //
+/*// ------ INSERT INTO ------- // Singola
 rule <k> INSERT INTO N:Id ( C:Id ) VALUES ( V:Value ) ; => .K ... </k>
 	<table-name> SetItem(N) </table-name>
-//    <schema> M:Map </schema>
 	<values>...	
-		//<value> M:Map => M[ C / V ] </value>
-		. => <value current="true"> C |-> V </value>
+		. => <value> C |-> V </value>	
+	... </values>*/
+// ------ INSERT INTO ------- // 
+rule <k> INSERT INTO N:Id ( C:Column , S:Columns => S ) VALUES ( V:Value , W:Values => W ) ; ... </k>
+	<table-name> SetItem(N) </table-name>
+	<values>...	
+		. => <value> C |-> V </value>
 	... </values>
+rule <k> INSERT INTO N:Id ( C:Id ) VALUES ( V:Value ) ; => .K ... </k>
+	<table-name> SetItem(N) </table-name>
+	<values>...	
+		. => <value> C |-> V </value>
+	... </values>
+rule <k> INSERT INTO N:Id ( .Columns ) VALUES ( .Values ) ; => .K ... </k>
 
-	/*
-poi da solo . => <value current="true"> Map </value> => <value current="false"> Map </value>
-	*/
-/*
-    	<value> M:Map => M |-> MM:Map[V / A] </value>
-*/
+
+
+
+//		<value> M:Map => M [V / C] </value> //non va bene perchè aggiorno e non aggiungo una nuova tupla (va bene per l'UPDATE)
 endmodule
