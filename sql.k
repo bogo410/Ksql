@@ -163,8 +163,4 @@ syntax Map ::= "InsertValues" "(" Columns "," Values ")"    [function]
 rule InsertValues ( C:Id , S:Columns , V:Value , W:Values ) => C |-> V InsertValues( S , W )
 rule InsertValues( .Columns , .Values ) => .Map
 
-<<<<<<< HEAD
-=======
-//		<value> M:Map => M [C <- V] </value> //non va bene perchè aggiorno e non aggiungo una nuova tupla (va bene per l'UPDATE)
->>>>>>> origin/master
 endmodule
