@@ -10,15 +10,15 @@ Add AddAttribute Stmts RenameColumnAttribute Attribute AddAttributes Attributes 
 context-free syntax
     "CREATE DATABASE" InsertDzId ";" -> Stmt {cons("Stmt1205Syn")}
     DzString -> String {}
-    "DROP COLUMN IF EXISTS" -> Ddrop {cons("Ddrop1333Syn")}
+    "DROP COLUMN IF EXISTS" -> Ddrop {cons("Ddrop1335Syn")}
     "CREATE TABLE" InsertDzId "(" InsertDzAttributes ")" ";" -> Stmt {cons("Stmt1446Syn")}
-    Stmt Stmts -> Stmts {cons("Stmts1334Syn")}
+    Stmt Stmts -> Stmts {cons("Stmts1336Syn")}
     Id Type -> Attribute {cons("Attribute170Syn")}
     {Id ","}* -> Tables {cons("Tables1ListSyn")}
     DzInt -> Int {}
     RenameColumnAttribute -> AlterCommand {}
     Stmt -> Stmts {}
-    "null" -> Value {cons("Value1342Syn")}
+    "null" -> Value {cons("Value1344Syn")}
     Add Attribute -> AddAttribute {cons("AddAttribute122Syn")}
     RenameTable -> AlterCommand {}
     DzFloat -> Float {}
@@ -31,14 +31,14 @@ context-free syntax
     AddAttribute -> AlterCommand {}
     "ADD SCHEMA" InsertDzId "(" InsertDzAttributes ")" ";" -> Command {cons("Command1463Syn")}
     DzBool -> Bool {}
-    Ddrop Id -> DdropAttribute {cons("DdropAttribute1303Syn")}
+    Ddrop Id -> DdropAttribute {cons("DdropAttribute1305Syn")}
     "RENAME TO" Id -> RenameTable {cons("RenameTable1466Syn")}
-    "ADD COLUMN" -> Add {cons("Add1407Syn")}
-    "SMALLINT" -> Type {cons("Type1362Syn")}
+    "ADD COLUMN" -> Add {cons("Add1408Syn")}
+    "SMALLINT" -> Type {cons("Type1364Syn")}
     {Value ","}* -> Values {cons("Values1ListSyn")}
     {RenameColumnAttribute ","}* -> RenameColumnAttributes {cons("RenameColumnAttributes1ListSyn")}
-    "INSERT INTO" InsertDzId "(" InsertDzColumns ")" "VALUES" "(" InsertDzValues ")" ";" -> Stmt {cons("Stmt1366Syn")}
-    "RENAME COLUMN" InsertDzId "TO" Id -> RenameColumnAttribute {cons("RenameColumnAttribute1322Syn")}
+    "INSERT INTO" InsertDzId "(" InsertDzColumns ")" "VALUES" "(" InsertDzValues ")" ";" -> Stmt {cons("Stmt1368Syn")}
+    "RENAME COLUMN" InsertDzId "TO" Id -> RenameColumnAttribute {cons("RenameColumnAttribute1324Syn")}
     {AddAttribute ","}* -> AddAttributes {cons("AddAttributes1ListSyn")}
     "VARCHAR" -> Type {cons("Type157Syn")}
     DdropAttribute -> AlterCommand {}

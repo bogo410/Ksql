@@ -27,3 +27,4 @@ DROP TABLE Newtable2 , Newtable3;
 CREATE TABLE Prova (Try SMALLINT, Pry VARCHAR, Cry VARCHAR);
 INSERT INTO Prova (Try) VALUES (5);
 INSERT INTO Prova (Try,Pry) VALUES (7,'"ciao"');
+INSERT INTO Prova (Try,Pry) VALUES (7);

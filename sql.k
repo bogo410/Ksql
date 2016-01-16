@@ -168,17 +168,25 @@ rule <k> INSERT INTO N:Id ( C:Columns ) VALUES ( V:Values ) ; => .K ... </k>
 		<schema> M:Map </schema>
 			<values>...	
 				. => <value> InsertValues( C , V , M ) </value>
-			... </values>
+			... </values> 
+		when (size(C) ==Int size(V))
 
 // ------ FUNZIONI ------ //
 //inserisce i valori nella tupla (null se non viene specificato il valore per qualche attributo)
 syntax Map ::= "InsertValues" "(" Columns "," Values "," Map ")"    [function]
-
 rule InsertValues ( C:Id , S:Columns , V:Value , W:Values , M:Map) => C |-> V InsertValues( S , W , M -Map (C |-> (M[C])))
-
 rule InsertValues( .Columns , .Values , (X:Id |-> T:Type) M:Map) => X |-> null InsertValues( .Columns , .Values , M )
-	
 rule InsertValues( .Columns , .Values , .Map) => .Map
+
+//calcola la dimensione della lista di colonne
+syntax Int ::= "size" "(" Columns ")"	[function]
+rule size( C:Id , S:Columns ) => 1 +Int size(S)
+rule size(.Columns) => 0
+
+//calcola la dimensione della lista di colonne
+syntax Int ::= "size" "(" Values ")"	[function]
+rule size(V:Value , W:Values) => 1 +Int size(W)
+rule size(.Values) => 0
 
 
 endmodule
