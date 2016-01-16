@@ -24,7 +24,7 @@ context-free syntax
     {Id ","}* -> Columns {cons("Columns1ListSyn")}
     {DdropAttribute ","}* -> DdropAttributes {cons("DdropAttributes1ListSyn")}
     Int -> Value {}
-    "'" InsertDzString "'" -> Value {cons("Value1503Syn")}
+    "'" InsertDzString "'" -> Value {cons("Value1502Syn")}
     "DROP IF EXISTS" -> Ddrop {cons("Ddrop138Syn")}
     "ALTER TABLE" InsertDzId InsertDzAlterCommands ";" -> Stmt {cons("Stmt140Syn")}
     AddAttribute -> AlterCommand {}
@@ -41,7 +41,7 @@ context-free syntax
     {AddAttribute ","}* -> AddAttributes {cons("AddAttributes1ListSyn")}
     "VARCHAR" -> Type {cons("Type157Syn")}
     DdropAttribute -> AlterCommand {}
-    "DROP" -> Ddrop {cons("Ddrop1530Syn")}
+    "DROP" -> Ddrop {cons("Ddrop1529Syn")}
     {Attribute ","}* -> Attributes {cons("Attributes1ListSyn")}
     "ADD" -> Add {cons("Add1474Syn")}
     "DROP COLUMN" -> Ddrop {cons("Ddrop1475Syn")}

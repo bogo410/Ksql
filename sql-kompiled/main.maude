@@ -1,4 +1,4 @@
-load "/Users/bogo410/Desktop/k/lib/maude/lib/k-prelude"
+load "/Users/bogo410/Desktop/k-3.5.2/lib/maude/lib/k-prelude"
 load "base.maude"
 load "builtins.maude"
 mod SQL is 

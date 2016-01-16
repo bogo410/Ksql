@@ -22,8 +22,9 @@ syntax Command ::=	"ADD SCHEMA" Id "(" Attributes ")" ";"
 
 syntax Attribute ::= 	Id Type	
 syntax Attributes ::= 	List{Attribute,","}
-	
-syntax Columns ::= 	List{Id,","}
+
+syntax Column ::= 	Id	
+syntax Columns ::= 	List{Column,","}
 
 syntax Value ::= Int
 				| "'" String "'"
@@ -151,16 +152,20 @@ rule <k> DROP TABLE N:Id ; => .K ... </k>
 rule <k> DROP TABLE .Tables ; => .K ... </k>
 
 // ------ INSERT INTO ------- // 
-rule <k> INSERT INTO N:Id ( C:Columns ) VALUES ( V:Values ) ; => .K ... </k>	
-		<table-name> SetItem(N) </table-name>
-			<values>...	
-				. => <value> InsertValues( C , V ) </value>
-			... </values>
+rule <k> INSERT INTO N:Id ( C:Column , S:Columns => S ) VALUES ( V:Value , W:Values => W ) ; ... </k>
+	<table-name> SetItem(N) </table-name>
+	<values>...	
+		. => <value> C |-> V </value>
+	... </values>
+rule <k> INSERT INTO N:Id ( C:Id ) VALUES ( V:Value ) ; => .K ... </k>
+	<table-name> SetItem(N) </table-name>
+	<values>...	
+		. => <value> C |-> V </value>
+	... </values>
+rule <k> INSERT INTO N:Id ( .Columns ) VALUES ( .Values ) ; => .K ... </k>
 
-// ------ FUNZIONI ------ //
-//inserisce i valori nella tupla
-syntax Map ::= "InsertValues" "(" Columns "," Values ")"    [function]
-rule InsertValues ( C:Id , S:Columns , V:Value , W:Values ) => C |-> V InsertValues( S , W )
-rule InsertValues( .Columns , .Values ) => .Map
 
+
+
+//		<value> M:Map => M [V / C] </value> //non va bene perchè aggiorno e non aggiungo una nuova tupla (va bene per l'UPDATE)
 endmodule
