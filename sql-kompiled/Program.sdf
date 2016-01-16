@@ -11,13 +11,14 @@ context-free syntax
     "CREATE DATABASE" InsertDzId ";" -> Stmt {cons("Stmt1205Syn")}
     DzString -> String {}
     "DROP COLUMN IF EXISTS" -> Ddrop {cons("Ddrop1333Syn")}
-    "CREATE TABLE" InsertDzId "(" InsertDzAttributes ")" ";" -> Stmt {cons("Stmt1443Syn")}
+    "CREATE TABLE" InsertDzId "(" InsertDzAttributes ")" ";" -> Stmt {cons("Stmt1444Syn")}
     Stmt Stmts -> Stmts {cons("Stmts1334Syn")}
     Id Type -> Attribute {cons("Attribute170Syn")}
     {Id ","}* -> Tables {cons("Tables1ListSyn")}
     DzInt -> Int {}
     RenameColumnAttribute -> AlterCommand {}
     Stmt -> Stmts {}
+    "null" -> Value {cons("Value1342Syn")}
     Add Attribute -> AddAttribute {cons("AddAttribute122Syn")}
     RenameTable -> AlterCommand {}
     DzFloat -> Float {}
@@ -28,23 +29,23 @@ context-free syntax
     "DROP IF EXISTS" -> Ddrop {cons("Ddrop138Syn")}
     "ALTER TABLE" InsertDzId InsertDzAlterCommands ";" -> Stmt {cons("Stmt140Syn")}
     AddAttribute -> AlterCommand {}
-    "ADD SCHEMA" InsertDzId "(" InsertDzAttributes ")" ";" -> Command {cons("Command1459Syn")}
+    "ADD SCHEMA" InsertDzId "(" InsertDzAttributes ")" ";" -> Command {cons("Command1460Syn")}
     DzBool -> Bool {}
     Ddrop Id -> DdropAttribute {cons("DdropAttribute1303Syn")}
-    "RENAME TO" Id -> RenameTable {cons("RenameTable1463Syn")}
-    "ADD COLUMN" -> Add {cons("Add1405Syn")}
-    "SMALLINT" -> Type {cons("Type1360Syn")}
+    "RENAME TO" Id -> RenameTable {cons("RenameTable1464Syn")}
+    "ADD COLUMN" -> Add {cons("Add1406Syn")}
+    "SMALLINT" -> Type {cons("Type1362Syn")}
     {Value ","}* -> Values {cons("Values1ListSyn")}
     {RenameColumnAttribute ","}* -> RenameColumnAttributes {cons("RenameColumnAttributes1ListSyn")}
-    "INSERT INTO" InsertDzId "(" InsertDzColumns ")" "VALUES" "(" InsertDzValues ")" ";" -> Stmt {cons("Stmt1365Syn")}
+    "INSERT INTO" InsertDzId "(" InsertDzColumns ")" "VALUES" "(" InsertDzValues ")" ";" -> Stmt {cons("Stmt1366Syn")}
     "RENAME COLUMN" InsertDzId "TO" Id -> RenameColumnAttribute {cons("RenameColumnAttribute1322Syn")}
     {AddAttribute ","}* -> AddAttributes {cons("AddAttributes1ListSyn")}
     "VARCHAR" -> Type {cons("Type157Syn")}
     DdropAttribute -> AlterCommand {}
-    "DROP" -> Ddrop {cons("Ddrop1530Syn")}
+    "DROP" -> Ddrop {cons("Ddrop1532Syn")}
     {Attribute ","}* -> Attributes {cons("Attributes1ListSyn")}
-    "ADD" -> Add {cons("Add1474Syn")}
-    "DROP COLUMN" -> Ddrop {cons("Ddrop1475Syn")}
+    "ADD" -> Add {cons("Add1475Syn")}
+    "DROP COLUMN" -> Ddrop {cons("Ddrop1476Syn")}
     "DROP TABLE" InsertDzTables ";" -> Stmt {cons("Stmt165Syn")}
     {AlterCommand ","}* -> AlterCommands {cons("AlterCommands1ListSyn")}
     AlterCommands -> InsertDzAlterCommands
@@ -101,6 +102,7 @@ lexical syntax
     "NaN" -> IdDz {reject}
     "Infinity" -> IdDz {reject}
     "false" -> IdDz {reject}
+    "null" -> IdDz {reject}
     "SMALLINT" -> IdDz {reject}
     "true" -> IdDz {reject}
     "VARCHAR" -> IdDz {reject}
@@ -118,6 +120,7 @@ lexical syntax
     "NaN" -> IdDz {reject}
     "Infinity" -> IdDz {reject}
     "false" -> IdDz {reject}
+    "null" -> IdDz {reject}
     "SMALLINT" -> IdDz {reject}
     "true" -> IdDz {reject}
     "VARCHAR" -> IdDz {reject}

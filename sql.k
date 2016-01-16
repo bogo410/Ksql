@@ -21,37 +21,47 @@ syntax Type ::=	"VARCHAR"
 syntax Command ::=	"ADD SCHEMA" Id "(" Attributes ")" ";"
 
 syntax Attribute ::= 	Id Type	
+
 syntax Attributes ::= 	List{Attribute,","}
 	
 syntax Columns ::= 	List{Id,","}
 
-syntax Value ::= Int
-				| "'" String "'"
-syntax Values ::= List{Value,","}
+syntax Value ::=	Int
+				|	"'" String "'"
+				|	"null"
+
+syntax Values ::=	List{Value,","}
 
 syntax Add ::=	"ADD"	
 			|	"ADD COLUMN"
-syntax AddAttribute ::=		Add Attribute
+
+syntax AddAttribute ::=	Add Attribute
+
 syntax AddAttributes ::=	List{AddAttribute,","}
 
 syntax Drop ::=	"DROP"	
 			|	"DROP COLUMN"
 			|	"DROP IF EXISTS" 
 			|	"DROP COLUMN IF EXISTS"
+
 syntax DropAttribute ::=	Drop Id
+
 syntax DropAttributes ::= 	List{DropAttribute,","}
 
 syntax RenameColumnAttribute ::= "RENAME COLUMN" Id "TO" Id
+
 syntax RenameColumnAttributes ::= List{RenameColumnAttribute,","}
 
 syntax Tables ::= 	List{Id,","}
+
 syntax RenameTable ::=	"RENAME TO" Id
 
-//PROVA: l'idea è di avere un comando tipo: ALTER TABLE Id AlterCommands
+//L'idea è di avere un comando tipo: ALTER TABLE Id AlterCommands
 syntax AlterCommand ::=	AddAttribute
 					|	DropAttribute
 					|	RenameColumnAttribute
 					|	RenameTable
+
 syntax AlterCommands ::=	List{AlterCommand,","}
 
 endmodule
@@ -91,7 +101,7 @@ rule <k> CREATE TABLE N:Id (A:Attributes) ; => ADD SCHEMA N ( A ) ; ... </k>
                	<table-name> SetItem(N) </table-name>
                	<schema> .Map </schema>
                	<values>
-					.Bag//<value> .Map </value>
+					.Bag
 				 </values>
          ... </table> )
 
@@ -121,6 +131,7 @@ rule <k> ALTER TABLE  N:Id .AddAttributes ; => .K ... </k>
 rule <k> ALTER TABLE N:Id Drop X:Id , D:DropAttributes => D ; ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map X |-> _ => M </schema>
+
 rule <k> ( ALTER TABLE N:Id Drop X:Id ; ) => .K ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map X |-> _ => M </schema>
@@ -143,6 +154,7 @@ rule <k> DROP TABLE N:Id , T:Tables => T ; ... </k>
 	( <table>...
                <table-name> SetItem(N) </table-name>
          ... </table> => . )
+
 rule <k> DROP TABLE N:Id ; => .K ... </k>
 	( <table>...
                <table-name> SetItem(N) </table-name>
@@ -153,14 +165,42 @@ rule <k> DROP TABLE .Tables ; => .K ... </k>
 // ------ INSERT INTO ------- // 
 rule <k> INSERT INTO N:Id ( C:Columns ) VALUES ( V:Values ) ; => .K ... </k>	
 		<table-name> SetItem(N) </table-name>
+		<schema> M:Map </schema>
 			<values>...	
-				. => <value> InsertValues( C , V ) </value>
+				. => <value> InsertValues( C , V , M ) </value>
 			... </values>
 
 // ------ FUNZIONI ------ //
-//inserisce i valori nella tupla
-syntax Map ::= "InsertValues" "(" Columns "," Values ")"    [function]
-rule InsertValues ( C:Id , S:Columns , V:Value , W:Values ) => C |-> V InsertValues( S , W )
-rule InsertValues( .Columns , .Values ) => .Map
+//inserisce i valori nella tupla (null se non viene specificato il valore per qualche attributo)
+syntax Map ::= "InsertValues" "(" Columns "," Values "," Map ")"    [function]
+
+rule InsertValues ( C:Id , S:Columns , V:Value , W:Values , M:Map) => C |-> V InsertValues( S , W , M -Map (C |-> (M[C])))
+
+rule InsertValues( .Columns , .Values , (X:Id |-> T:Type) M:Map) => X |-> null InsertValues( .Columns , .Values , M )
+	
+rule InsertValues( .Columns , .Values , .Map) => .Map
+
 
 endmodule
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
