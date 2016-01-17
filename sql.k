@@ -183,7 +183,7 @@ syntax Int ::= "size" "(" Columns ")"	[function]
 rule size( C:Id , S:Columns ) => 1 +Int size(S)
 rule size(.Columns) => 0
 
-//calcola la dimensione della lista di colonne
+//calcola la dimensione della lista di valori
 syntax Int ::= "size" "(" Values ")"	[function]
 rule size(V:Value , W:Values) => 1 +Int size(W)
 rule size(.Values) => 0
