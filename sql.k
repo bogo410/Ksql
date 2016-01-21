@@ -9,12 +9,15 @@ syntax Stmt ::=	"CREATE DATABASE" Id ";"
 			|	"ALTER TABLE" Id AlterCommands ";"
 			|	"DROP TABLE" Tables ";"
 			|	"INSERT INTO" Id "(" Columns ")" "VALUES" "(" Values ")" ";"
+			|	"UPDATE" Id "SET" Substitutions "WHERE" Conditions ";"	//aggiunto da qui(per l'UPDATE) 
+
 
 syntax Stmts ::= 	Stmt
 				|	Stmt Stmts
 
 // ------ tipi SQL ------ //
 syntax Type ::=	"VARCHAR"
+			|	"VARCHAR" "[" Int "]"	//aggiunto da qui(per il campo del VARCHAR) 
 			|	"SMALLINT"
 
 // ------ comandi e tipi di supporto utilizzati solo da K ------ //
@@ -55,6 +58,38 @@ syntax RenameColumnAttributes ::= List{RenameColumnAttribute,","}
 syntax Tables ::= 	List{Id,","}
 
 syntax RenameTable ::=	"RENAME TO" Id
+
+//aggiunto da qui(per l'UPDATE) 
+syntax Exp ::= Int | Bool | String | Id
+               | "(" Exp ")"             [bracket]
+               | "-" Exp                 [strict]
+               > left:
+                 Exp "*" Exp             [strict, left]
+               | Exp "/" Exp             [strict, left]
+               > left:
+                 Exp "+" Exp             [strict, left]
+               | Exp "-" Exp             [strict, left]
+               > left:
+                 Exp "AND" Exp            [strict(1), left]
+               | Exp "OR" Exp            [strict(1), left]
+
+syntax Exps ::= List{Exp,","}          [strict]
+
+syntax Substitution ::=	Id "=" Id
+					|	Id "=" Exp
+					|	Id "=" "'" String "'"
+					|	Id "=" "'" Int "'"
+
+syntax Substitutions ::=	List{Substitution,","}
+
+syntax Condition ::=	Id "=" "'" String "'"
+					|	Id "=" "'" Int "'"
+					|	Id "=" Exp
+
+syntax Conditions ::=	Condition
+					|	Conditions "AND" Conditions
+					|	Conditions "OR" Conditions
+//a qui(per l'UPDATE) 
 
 //L'idea è di avere un comando tipo: ALTER TABLE Id AlterCommands
 syntax AlterCommand ::=	AddAttribute
@@ -167,16 +202,16 @@ rule <k> INSERT INTO N:Id ( C:Columns ) VALUES ( V:Values ) ; => .K ... </k>
 		<table-name> SetItem(N) </table-name>
 		<schema> M:Map </schema>
 			<values>...	
-				. => <value> InsertValues( C , V , M ) </value>
+				. => <value> insertValues( C , V , M ) </value>
 			... </values> 
-		when (size(C) ==Int size(V))
+		when (size(C) ==Int size(V) andBool charControl(M,C,V))
 
 // ------ FUNZIONI ------ //
 //inserisce i valori nella tupla (null se non viene specificato il valore per qualche attributo)
-syntax Map ::= "InsertValues" "(" Columns "," Values "," Map ")"    [function]
-rule InsertValues ( C:Id , S:Columns , V:Value , W:Values , M:Map) => C |-> V InsertValues( S , W , M -Map (C |-> (M[C])))
-rule InsertValues( .Columns , .Values , (X:Id |-> T:Type) M:Map) => X |-> null InsertValues( .Columns , .Values , M )
-rule InsertValues( .Columns , .Values , .Map) => .Map
+syntax Map ::= "insertValues" "(" Columns "," Values "," Map ")"    [function]
+rule insertValues ( C:Id , S:Columns , V:Value , W:Values , M:Map) => C |-> V insertValues( S , W , M -Map (C |-> (M[C])))
+rule insertValues( .Columns , .Values , (X:Id |-> T:Type) M:Map) => X |-> null insertValues( .Columns , .Values , M )
+rule insertValues( .Columns , .Values , .Map) => .Map
 
 //calcola la dimensione della lista di colonne
 syntax Int ::= "size" "(" Columns ")"	[function]
@@ -188,6 +223,10 @@ syntax Int ::= "size" "(" Values ")"	[function]
 rule size(V:Value , W:Values) => 1 +Int size(W)
 rule size(.Values) => 0
 
+syntax Bool ::= "charControl" "(" Map "," Columns "," Values ")"	[function]
+rule charControl( M:Map , Id , I:Id , C:Columns , ' S:String ' , V:Values ) => charControl( M , C , V )
+		when ( M[I] ==Int lengthString(S))
+rule charControl( _ , .Columns , .Values ) => true
 
 endmodule
 
