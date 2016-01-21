@@ -17,7 +17,7 @@ syntax Stmts ::= 	Stmt
 
 // ------ tipi SQL ------ //
 syntax Type ::=	"VARCHAR"
-			|	"VARCHAR" "[" Int "]"	//aggiunto da qui(per il campo del VARCHAR) 
+			|	"VARCHAR" "(" Int ")"	//aggiunto da qui(per il campo del VARCHAR) 
 			|	"SMALLINT"
 
 // ------ comandi e tipi di supporto utilizzati solo da K ------ //
@@ -223,15 +223,20 @@ syntax Int ::= "size" "(" Values ")"	[function]
 rule size(V:Value , W:Values) => 1 +Int size(W)
 rule size(.Values) => 0
 
+//controlla che la stringa inserita sia entro la lunghezza definita in CREATE TABLE
 syntax Bool ::= "charControl" "(" Map "," Columns "," Values ")"	[function]
-rule charControl( M:Map , Id , I:Id , C:Columns , ' S:String ' , V:Values ) => charControl( M , C , V )
-		when ( M[I] ==Int lengthString(S))
+rule charControl( M:Map , I:Id , C:Columns , ' S:String ' , V:Values ) => #if ( control( S , M[I]) ) #then ( charControl( M , C , V ) ) #else false #fi
+rule charControl( M:Map , I:Id , C:Columns ,  S:Int , V:Values ) => charControl( M , C , V )
 rule charControl( _ , .Columns , .Values ) => true
 
+//funzione di supporto alla funzione charControl() che controlla effettivamente se la stringa inserita è accettabile
+syntax Bool ::= "control" "(" String "," Type ")"	[function]
+rule control( S:String , VARCHAR ( I:Int )) => true
+		when ( I >=Int lengthString(S) )
+rule control( S:String , VARCHAR ) => true
+
+
 endmodule
-
-
-
 
 
 
