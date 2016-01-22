@@ -17,7 +17,7 @@ syntax Stmts ::= 	Stmt
 
 // ------ tipi SQL ------ //
 syntax Type ::=	"VARCHAR"
-			|	"VARCHAR" "(" Int ")"
+			|	"VARCHAR" "(" Int ")"	//aggiunto da qui(per il campo del VARCHAR) 
 			|	"SMALLINT"
 
 // ------ comandi e tipi di supporto utilizzati solo da K ------ //
@@ -59,6 +59,7 @@ syntax Tables ::= 	List{Id,","}
 
 syntax RenameTable ::=	"RENAME TO" Id
 
+//aggiunto da qui(per l'UPDATE) 
 syntax Exp ::= Int | Bool | String | Id
                | "(" Exp ")"             [bracket]
                | "-" Exp                 [strict]
@@ -74,7 +75,7 @@ syntax Exp ::= Int | Bool | String | Id
 
 syntax Exps ::= List{Exp,","}          [strict]
 
-syntax Substitution ::=	Id "=" "null"
+syntax Substitution ::=	Id "=" Id
 					|	Id "=" Exp
 					|	Id "=" "'" String "'"
 					|	Id "=" "'" Int "'"
@@ -86,10 +87,9 @@ syntax Condition ::=	Id "=" "'" String "'"
 					|	Id "=" Exp
 
 syntax Conditions ::=	Condition
-					|	Conditions AndOr Conditions
-
-syntax AndOr ::=	"AND"
-				|	"OR" 
+					|	Conditions "AND" Conditions
+					|	Conditions "OR" Conditions
+//a qui(per l'UPDATE) 
 
 //L'idea è di avere un comando tipo: ALTER TABLE Id AlterCommands
 syntax AlterCommand ::=	AddAttribute
@@ -201,42 +201,10 @@ rule <k> DROP TABLE .Tables ; => .K ... </k>
 rule <k> INSERT INTO N:Id ( C:Columns ) VALUES ( V:Values ) ; => .K ... </k>	
 		<table-name> SetItem(N) </table-name>
 		<schema> M:Map </schema>
-			<values> ...	
+			<values>...	
 				. => <value> insertValues( C , V , M ) </value>
 			... </values> 
 		when (size(C) ==Int size(V) andBool charControl(M,C,V))
-
-// ------ UPDATE ------- //
-rule <k> UPDATE N:Id SET ( S:Substitution , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( Z ) WHERE ( C ) ; ... </k>		
-		<table-name> SetItem(N) </table-name>
-		<schema> M:Map </schema>
-		<values> ...
-			B:Bag
-			//come identifico le mappe? devo ciclare sulle mappe in qualche modo 
-			// e chiamare una funzione che controlla la condizione su tutte le mappe 
-			//  e sostituisce i valori sempre su tutte le mappe!
-		... </values> 
-
-/*
-
-syntax Substitution ::=	Id "=" "null"
-					|	Id "=" Exp
-					|	Id "=" "'" String "'"
-					|	Id "=" "'" Int "'"
-
-syntax Substitutions ::=	List{Substitution,","}
-
-syntax Condition ::=	Id "=" "'" String "'"
-					|	Id "=" "'" Int "'"
-					|	Id "=" Exp
-
-syntax Conditions ::=	Condition
-					|	Conditions AndOr Conditions
-
-syntax AndOr ::=	"AND"
-				|	"OR" 
-
-*/
 
 // ------ FUNZIONI ------ //
 //inserisce i valori nella tupla (null se non viene specificato il valore per qualche attributo)
