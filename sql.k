@@ -22,6 +22,7 @@ syntax Type ::=	"VARCHAR"
 
 // ------ comandi e tipi di supporto utilizzati solo da K ------ //
 syntax Command ::=	"ADD SCHEMA" Id "(" Attributes ")" ";"
+				|	"SAVE KEY" Id "(" Columns ")" "VALUES" "(" Values ")" ";"
 
 syntax Attribute ::= 	Id Type	
 					|	Id Type	"PRIMARY KEY"
@@ -115,12 +116,13 @@ module SQL
 									<table-name color="blue"> .Set </table-name>
 									<schema color="Orchid"> .Map </schema>
 									<key color="purple"> .Set </key>
+									<keyvalues> .Set </keyvalues>
 									<values multiplicity="*" color="gray">
 										<value color="black"> .Map </value>
 									</values>
 								</table>
 							</tables> 
-						</database> 
+						</database>
 				  	</T>
 
 //valuta il primo comando poi il secondo gruppo di comandi
@@ -206,14 +208,31 @@ rule <k> DROP TABLE N:Id ; => .K ... </k>
 rule <k> DROP TABLE .Tables ; => .K ... </k>
 
 // ------ INSERT INTO ------- // 
-rule <k> INSERT INTO N:Id ( C:Columns ) VALUES ( V:Values ) ; => .K ... </k>	
+rule <k> INSERT INTO N:Id ( C:Columns ) VALUES ( V:Values ) ; => SAVE KEY N:Id ( C:Columns ) VALUES ( V:Values ) ; ... </k>	
 		<table-name> SetItem(N) </table-name>
 		<schema> M:Map </schema>
 		<key> S:Set </key>
 			<values> ...	
 				B:Bag ( . => <value> insertValues( C , V , M ) </value> )
-			... </values> 
+			... </values>
 		when (size(C) ==Int size(V) andBool charControl(M,C,V) andBool checkKey(C,S,V,M,B))
+
+//salva i valori della primary key in un set
+rule <k> SAVE KEY N:Id ( C:Columns ) VALUES ( V:Values ) ; => .K ... </k>	
+		<table-name> SetItem(N) </table-name>
+		<keyvalues> S:Set => S SetItem(V) </keyvalues>	
+		when ( S =/=K .Set ) //solo quando ho una chiave
+
+//salva i valori della primary key in un set
+rule <k> SAVE KEY N:Id ( C:Columns ) VALUES ( V:Values ) ; => .K ... </k>	
+		<table-name> SetItem(N) </table-name>
+		<keyvalues> S:Set => SetItem(V) </keyvalues>	
+		when ( S ==K .Set ) //solo quando ho una chiave
+
+
+
+
+
 
 // ------ UPDATE ------- //
 rule <k> UPDATE N:Id SET ( S:Substitution , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( Z ) WHERE ( C ) ; ... </k>		
@@ -270,14 +289,20 @@ rule control( S:String , VARCHAR ( I:Int )) => true
 		when ( I >=Int lengthString(S) )
 rule control( S:String , VARCHAR ) => true
 
+
+
+
+
 //controlla che si faccia l'inserimento dell'attributo chiave se esiste una primary key nella tabella
-syntax Bool ::= "checkKey" "(" Columns "," Set "," Values "," Map "," Bag ")"	[function]
+syntax Bool ::=	"checkKey" "(" Columns "," Set "," Values "," Map "," Bag ")"	[function]
 rule checkKey( C:Id , G:Columns , S:Set , V:Value , W:Values , M:Map , B:Bag ) => #if ( C in S ) #then ( isNotAlreadyIn( C , V , M , B ) ) #else ( checkKey( G , S , W , M , B ) ) #fi
 rule checkKey( C:Columns, .Set , _ , _ , _ ) => true	//se la primary key non esiste nella tabella va bene
 
 //controlla se la chiave inserita esiste gia
-syntax Bool ::= "isNotAlreadyIn" "(" Id "," Value "," Map "," Bag ")"	[function]
-rule isNotAlreadyIn( C:Id , V:Value , M:Map , B:Bag ) => #if ( C in B ) #then ( false ) #else ( true ) #fi 	//non va
+syntax Bool ::=	"isNotAlreadyIn" "(" Id "," Value "," Map "," Bag ")"	[function]
+rule isNotAlreadyIn( C:Id , V:Value , M:Map , B:Bag ) => #if ( V in B ) #then ( false ) #else ( true ) #fi 	//non va
+
+
 
 //calcola la dimensione della lista di colonne
 syntax Int ::= "size" "(" Columns ")"	[function]
@@ -290,9 +315,10 @@ rule size(V:Value , W:Values) => 1 +Int size(W)
 rule size(.Values) => 0
 
 
-  syntax Bool ::= K "in" Bag    [function]
+ syntax Bool ::= K "in" Bag    [function]
   rule K1 in BagItem(K2) B:Bag => (K1 =K K2) orBool (K1 in B)
   rule _ in .Bag => false
+
 
 endmodule
 
