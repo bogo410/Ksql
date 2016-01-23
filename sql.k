@@ -9,7 +9,7 @@ syntax Stmt ::=	"CREATE DATABASE" Id ";"
 			|	"ALTER TABLE" Id AlterCommands ";"
 			|	"DROP TABLE" Tables ";"
 			|	"INSERT INTO" Id "(" Columns ")" "VALUES" "(" Values ")" ";"
-			|	"UPDATE" Id "SET" Substitutions "WHERE" Conditions ";"	//aggiunto da qui(per l'UPDATE) 
+			|	"UPDATE" Id "SET" Substitutions "WHERE" Conditions ";"
 
 
 syntax Stmts ::= 	Stmt
@@ -24,6 +24,7 @@ syntax Type ::=	"VARCHAR"
 syntax Command ::=	"ADD SCHEMA" Id "(" Attributes ")" ";"
 
 syntax Attribute ::= 	Id Type	
+					|	Id Type	"PRIMARY KEY"
 
 syntax Attributes ::= 	List{Attribute,","}
 	
@@ -113,6 +114,7 @@ module SQL
 								<table multiplicity="*" color="red"> 
 									<table-name color="blue"> .Set </table-name>
 									<schema color="Orchid"> .Map </schema>
+									<key color="purple"> .Set </key>
 									<values multiplicity="*" color="gray">
 										<value color="black"> .Map </value>
 									</values>
@@ -135,6 +137,7 @@ rule <k> CREATE TABLE N:Id (A:Attributes) ; => ADD SCHEMA N ( A ) ; ... </k>
        ( . => <table>...
                	<table-name> SetItem(N) </table-name>
                	<schema> .Map </schema>
+               	<key> .Set </key>
                	<values>
 					.Bag
 				 </values>
@@ -144,6 +147,11 @@ rule <k> CREATE TABLE N:Id (A:Attributes) ; => ADD SCHEMA N ( A ) ; ... </k>
 rule <k> ADD SCHEMA N:Id ( X:Id T:Type , A:Attributes => A) ; ... </k>
 	<table-name> SetItem(N) </table-name>
 	<schema> M:Map => M[X <- T] </schema>
+
+rule <k> ADD SCHEMA N:Id ( X:Id T:Type PRIMARY KEY , A:Attributes => A) ; ... </k>
+	<table-name> SetItem(N) </table-name>
+	<schema> M:Map => M[X <- T] </schema>
+	<key> .Set => SetItem(X) </key>
 
 //se gli attributi sono finiti consuma il comando( lo rimpiazza con .K cioè il comando vuoto di tipo K )
 rule <k> ADD SCHEMA N:Id ( .Attributes ) ; => .K ... </k>
@@ -201,17 +209,18 @@ rule <k> DROP TABLE .Tables ; => .K ... </k>
 rule <k> INSERT INTO N:Id ( C:Columns ) VALUES ( V:Values ) ; => .K ... </k>	
 		<table-name> SetItem(N) </table-name>
 		<schema> M:Map </schema>
+		<key> S:Set </key>
 			<values> ...	
-				. => <value> insertValues( C , V , M ) </value>
+				B:Bag ( . => <value> insertValues( C , V , M ) </value> )
 			... </values> 
-		when (size(C) ==Int size(V) andBool charControl(M,C,V))
+		when (size(C) ==Int size(V) andBool charControl(M,C,V) andBool checkKey(C,S,V,M,B))
 
 // ------ UPDATE ------- //
 rule <k> UPDATE N:Id SET ( S:Substitution , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( Z ) WHERE ( C ) ; ... </k>		
 		<table-name> SetItem(N) </table-name>
 		<schema> M:Map </schema>
 		<values> ...
-			B:Bag
+			B:Bag => updateValues(B,S,C)
 			//come identifico le mappe? devo ciclare sulle mappe in qualche modo 
 			// e chiamare una funzione che controlla la condizione su tutte le mappe 
 			//  e sostituisce i valori sempre su tutte le mappe!
@@ -245,15 +254,9 @@ rule insertValues ( C:Id , S:Columns , V:Value , W:Values , M:Map) => C |-> V in
 rule insertValues( .Columns , .Values , (X:Id |-> T:Type) M:Map) => X |-> null insertValues( .Columns , .Values , M )
 rule insertValues( .Columns , .Values , .Map) => .Map
 
-//calcola la dimensione della lista di colonne
-syntax Int ::= "size" "(" Columns ")"	[function]
-rule size( C:Id , S:Columns ) => 1 +Int size(S)
-rule size(.Columns) => 0
+//aggiorna i valori nelle tuple
+syntax Bag ::= "updateValues" "(" Bag "," Substitution "," Conditions ")"    [function]
 
-//calcola la dimensione della lista di valori
-syntax Int ::= "size" "(" Values ")"	[function]
-rule size(V:Value , W:Values) => 1 +Int size(W)
-rule size(.Values) => 0
 
 //controlla che la stringa inserita sia entro la lunghezza definita in CREATE TABLE
 syntax Bool ::= "charControl" "(" Map "," Columns "," Values ")"	[function]
@@ -267,6 +270,29 @@ rule control( S:String , VARCHAR ( I:Int )) => true
 		when ( I >=Int lengthString(S) )
 rule control( S:String , VARCHAR ) => true
 
+//controlla che si faccia l'inserimento dell'attributo chiave se esiste una primary key nella tabella
+syntax Bool ::= "checkKey" "(" Columns "," Set "," Values "," Map "," Bag ")"	[function]
+rule checkKey( C:Id , G:Columns , S:Set , V:Value , W:Values , M:Map , B:Bag ) => #if ( C in S ) #then ( isNotAlreadyIn( C , V , M , B ) ) #else ( checkKey( G , S , W , M , B ) ) #fi
+rule checkKey( C:Columns, .Set , _ , _ , _ ) => true	//se la primary key non esiste nella tabella va bene
+
+//controlla se la chiave inserita esiste gia
+syntax Bool ::= "isNotAlreadyIn" "(" Id "," Value "," Map "," Bag ")"	[function]
+rule isNotAlreadyIn( C:Id , V:Value , M:Map , B:Bag ) => #if ( C in B ) #then ( false ) #else ( true ) #fi 	//non va
+
+//calcola la dimensione della lista di colonne
+syntax Int ::= "size" "(" Columns ")"	[function]
+rule size( C:Id , S:Columns ) => 1 +Int size(S)
+rule size(.Columns) => 0
+
+//calcola la dimensione della lista di valori
+syntax Int ::= "size" "(" Values ")"	[function]
+rule size(V:Value , W:Values) => 1 +Int size(W)
+rule size(.Values) => 0
+
+
+  syntax Bool ::= K "in" Bag    [function]
+  rule K1 in BagItem(K2) B:Bag => (K1 =K K2) orBool (K1 in B)
+  rule _ in .Bag => false
 
 endmodule
 

@@ -27,4 +27,6 @@ CREATE TABLE Prova (Try SMALLINT, Pry VARCHAR(4), Cry VARCHAR);
 INSERT INTO Prova (Try) VALUES (5);
 INSERT INTO Prova (Try,Pry) VALUES (7,'"ciao"');
 
+CREATE TABLE Chiave (key SMALLINT PRIMARY KEY, notkey VARCHAR(4));
+
 //INSERT INTO Prova (Try,Pry) VALUES (7);
