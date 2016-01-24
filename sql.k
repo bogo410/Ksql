@@ -9,6 +9,7 @@ syntax Stmt ::=	"CREATE DATABASE" Id ";"
 			|	"ALTER TABLE" Id AlterCommands ";"
 			|	"DROP TABLE" Tables ";"
 			|	"INSERT INTO" Id "(" Columns ")" "VALUES" "(" Values ")" ";"
+			|	"UPDATE" Id "SET" Substitutions ";"
 			|	"UPDATE" Id "SET" Substitutions "WHERE" Conditions ";"
 
 
@@ -100,6 +101,7 @@ syntax AlterCommand ::=	AddAttribute
 					|	RenameTable
 
 syntax AlterCommands ::=	List{AlterCommand,","}
+
 
 endmodule
 
@@ -214,7 +216,7 @@ rule <k> INSERT INTO N:Id ( C:Columns ) VALUES ( V:Values ) ; => SAVE KEY N:Id (
 		<key> Z:Set </key>
 		<keyvalues> S:Set </keyvalues>
 			<values> ...	
-				B:Bag ( . => <value> insertValues( C , V , M ) </value> )
+				 . => <value> insertValues( C , V , M ) </value>
 			... </values>
 		when (size(C) ==Int size(V) andBool charControl(M,C,V) andBool checkKey(C,Z,V,S))
 
@@ -234,6 +236,20 @@ rule <k> SAVE KEY N:Id ( C:Id , G:Columns ) VALUES ( V:Value , W:Values ) ; => S
 rule <k> SAVE KEY N:Id ( .Columns ) VALUES ( .Values ) ; => .K ... </k>	
 
 // ------ UPDATE ------- //
+rule <k> UPDATE N:Id SET ( S:Substitution , Z:Substitutions ) ; => UPDATE N:Id SET ( Z ) ; ... </k>		
+		<table-name> SetItem(N) </table-name>
+		<schema> M:Map </schema>
+		<values> ...
+			
+			M:Map X |-> T:Type => M[B <- T]
+
+			//come identifico le mappe? devo ciclare sulle mappe in qualche modo 
+			// e chiamare una funzione che controlla la condizione su tutte le mappe 
+			//  e sostituisce i valori sempre su tutte le mappe!
+		... </values>
+
+rule <k> UPDATE N:Id SET ( .Substitutions ) ; => .K ... </k>	
+
 rule <k> UPDATE N:Id SET ( S:Substitution , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( Z ) WHERE ( C ) ; ... </k>		
 		<table-name> SetItem(N) </table-name>
 		<schema> M:Map </schema>
@@ -294,12 +310,12 @@ rule control( S:String , VARCHAR ) => true
 
 //controlla che si faccia l'inserimento dell'attributo chiave se esiste una primary key nella tabella
 syntax Bool ::=	"checkKey" "(" Columns "," Set "," Values "," Set ")"	[function]
-rule checkKey( C:Id , G:Columns , Z:Set , V:Value , W:Values , S:Set ) => #if ( C in Z ) #then ( isNotAlreadyIn( C , V , S ) ) #else ( checkKey( G , Z , W , S ) ) #fi
+rule checkKey( C:Id , G:Columns , Z:Set , V:Value , W:Values , S:Set ) => #if ( (C in Z) orBool (Z ==K .Set) ) #then ( isNotAlreadyIn( C , V , S ) ) #else ( checkKey( G , Z , W , S ) ) #fi
 rule checkKey( C:Columns, .Set , _ , _ , _ ) => true	//se la primary key non esiste nella tabella va bene
 
 //controlla se la chiave inserita esiste gia
 syntax Bool ::=	"isNotAlreadyIn" "(" Id "," Value "," Set ")"	[function]
-rule isNotAlreadyIn( C:Id , V:Value , S:Set ) => #if ( V in S ) #then ( false ) #else ( true ) #fi 	//non va
+rule isNotAlreadyIn( C:Id , V:Value , S:Set ) => #if ( V in S ) #then ( false ) #else ( true ) #fi
 
 //calcola la dimensione della lista di colonne
 syntax Int ::= "size" "(" Columns ")"	[function]
