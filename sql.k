@@ -211,28 +211,27 @@ rule <k> DROP TABLE .Tables ; => .K ... </k>
 rule <k> INSERT INTO N:Id ( C:Columns ) VALUES ( V:Values ) ; => SAVE KEY N:Id ( C:Columns ) VALUES ( V:Values ) ; ... </k>	
 		<table-name> SetItem(N) </table-name>
 		<schema> M:Map </schema>
-		<key> S:Set </key>
+		<key> Z:Set </key>
+		<keyvalues> S:Set </keyvalues>
 			<values> ...	
 				B:Bag ( . => <value> insertValues( C , V , M ) </value> )
 			... </values>
-		when (size(C) ==Int size(V) andBool charControl(M,C,V) andBool checkKey(C,S,V,M,B))
+		when (size(C) ==Int size(V) andBool charControl(M,C,V) andBool checkKey(C,Z,V,S))
 
 //salva i valori della primary key in un set
-rule <k> SAVE KEY N:Id ( C:Columns ) VALUES ( V:Values ) ; => .K ... </k>	
+rule <k> SAVE KEY N:Id ( C:Id , G:Columns ) VALUES ( V:Value , W:Values ) ; => SAVE KEY N ( G ) VALUES ( W ) ; ... </k>	
 		<table-name> SetItem(N) </table-name>
-		<keyvalues> S:Set => S SetItem(V) </keyvalues>	
-		when ( S =/=K .Set ) //solo quando ho una chiave
+		<key> Z:Set </key>
+		<keyvalues> S:Set => S SetItem(V) </keyvalues>
+		when ( C in Z ) //solo quando C è chiave
 
-//salva i valori della primary key in un set
-rule <k> SAVE KEY N:Id ( C:Columns ) VALUES ( V:Values ) ; => .K ... </k>	
+//se non è una primary key va avanti a controllare senza fare nulla
+rule <k> SAVE KEY N:Id ( C:Id , G:Columns ) VALUES ( V:Value , W:Values ) ; => SAVE KEY N ( G ) VALUES ( W ) ; ... </k>	
 		<table-name> SetItem(N) </table-name>
-		<keyvalues> S:Set => SetItem(V) </keyvalues>	
-		when ( S ==K .Set ) //solo quando ho una chiave
+		<key> Z:Set </key>
+		when notBool( C in Z ) //solo quando C non è chiave
 
-
-
-
-
+rule <k> SAVE KEY N:Id ( .Columns ) VALUES ( .Values ) ; => .K ... </k>	
 
 // ------ UPDATE ------- //
 rule <k> UPDATE N:Id SET ( S:Substitution , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( Z ) WHERE ( C ) ; ... </k>		
@@ -244,6 +243,8 @@ rule <k> UPDATE N:Id SET ( S:Substitution , Z:Substitutions ) WHERE ( C:Conditio
 			// e chiamare una funzione che controlla la condizione su tutte le mappe 
 			//  e sostituisce i valori sempre su tutte le mappe!
 		... </values> 
+
+
 
 /*
 
@@ -277,6 +278,8 @@ rule insertValues( .Columns , .Values , .Map) => .Map
 syntax Bag ::= "updateValues" "(" Bag "," Substitution "," Conditions ")"    [function]
 
 
+
+
 //controlla che la stringa inserita sia entro la lunghezza definita in CREATE TABLE
 syntax Bool ::= "charControl" "(" Map "," Columns "," Values ")"	[function]
 rule charControl( M:Map , I:Id , C:Columns , ' S:String ' , V:Values ) => #if ( control( S , M[I]) ) #then ( charControl( M , C , V ) ) #else false #fi
@@ -289,20 +292,14 @@ rule control( S:String , VARCHAR ( I:Int )) => true
 		when ( I >=Int lengthString(S) )
 rule control( S:String , VARCHAR ) => true
 
-
-
-
-
 //controlla che si faccia l'inserimento dell'attributo chiave se esiste una primary key nella tabella
-syntax Bool ::=	"checkKey" "(" Columns "," Set "," Values "," Map "," Bag ")"	[function]
-rule checkKey( C:Id , G:Columns , S:Set , V:Value , W:Values , M:Map , B:Bag ) => #if ( C in S ) #then ( isNotAlreadyIn( C , V , M , B ) ) #else ( checkKey( G , S , W , M , B ) ) #fi
+syntax Bool ::=	"checkKey" "(" Columns "," Set "," Values "," Set ")"	[function]
+rule checkKey( C:Id , G:Columns , Z:Set , V:Value , W:Values , S:Set ) => #if ( C in Z ) #then ( isNotAlreadyIn( C , V , S ) ) #else ( checkKey( G , Z , W , S ) ) #fi
 rule checkKey( C:Columns, .Set , _ , _ , _ ) => true	//se la primary key non esiste nella tabella va bene
 
 //controlla se la chiave inserita esiste gia
-syntax Bool ::=	"isNotAlreadyIn" "(" Id "," Value "," Map "," Bag ")"	[function]
-rule isNotAlreadyIn( C:Id , V:Value , M:Map , B:Bag ) => #if ( V in B ) #then ( false ) #else ( true ) #fi 	//non va
-
-
+syntax Bool ::=	"isNotAlreadyIn" "(" Id "," Value "," Set ")"	[function]
+rule isNotAlreadyIn( C:Id , V:Value , S:Set ) => #if ( V in S ) #then ( false ) #else ( true ) #fi 	//non va
 
 //calcola la dimensione della lista di colonne
 syntax Int ::= "size" "(" Columns ")"	[function]
