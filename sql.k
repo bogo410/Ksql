@@ -119,12 +119,17 @@ module SQL
 									<schema color="Orchid"> .Map </schema>
 									<key color="purple"> .Set </key>
 									<keyvalues> .Set </keyvalues>
+									<numvalues> #counter </numvalues>
 									<values multiplicity="*" color="gray">
-										<value color="black"> .Map </value>
+										<value color="black"> 
+											<numvalue> #counter </numvalue>
+											<val> .Map </val> 
+										</value>
 									</values>
 								</table>
 							</tables> 
 						</database>
+						<count> #counter </count>
 				  	</T>
 
 //valuta il primo comando poi il secondo gruppo di comandi
@@ -142,6 +147,7 @@ rule <k> CREATE TABLE N:Id (A:Attributes) ; => ADD SCHEMA N ( A ) ; ... </k>
                	<table-name> SetItem(N) </table-name>
                	<schema> .Map </schema>
                	<key> .Set </key>
+               	<numvalues> 0 </numvalues>
                	<values>
 					.Bag
 				 </values>
@@ -215,8 +221,14 @@ rule <k> INSERT INTO N:Id ( C:Columns ) VALUES ( V:Values ) ; => SAVE KEY N:Id (
 		<schema> M:Map </schema>
 		<key> Z:Set </key>
 		<keyvalues> S:Set </keyvalues>
-			<values> ...	
-				 . => <value> insertValues( C , V , M ) </value>
+		<numvalues> L:Int => L +Int 1 </numvalues>
+			<values> ...
+
+				( . => <value> ...
+							<numvalue> inc(L) </numvalue>
+							<val> insertValues( C , V , M ) </val>
+						... </value> )
+				
 			... </values>
 		when (size(C) ==Int size(V) andBool charControl(M,C,V) andBool checkKey(C,Z,V,S))
 
@@ -240,17 +252,34 @@ rule <k> SAVE KEY N:Id ( .Columns ) VALUES ( .Values ) ; => .K ... </k>
 
 
 
-rule <k> UPDATE N:Id SET I:Id = ' S:Int ' ; => .K ... </k>		
+rule <k> UPDATE N:Id SET I:Id = ' S:Int ' ; => UPDATE N:Id SET I:Id = ' S:Int ' ; ... </k>		
 		<table-name> SetItem(N) </table-name>
+		<numvalues> X:Int </numvalues>
 		<values> ...
-		
-			 <value> M:Map => updateMap( M , I |-> S ) </value> //recupero il valore data la chiave e lo aggiorno
-			
-			//come identifico le mappe? devo ciclare sulle mappe in qualche modo 
-			// e chiamare una funzione che controlla la condizione su tutte le mappe 
-			//  e sostituisce i valori sempre su tutte le mappe!
+
+			<value> 
+				<numvalue> L:Int </numvalue>
+				<val> M:Map => updateMap( M , I |-> S ) </val> 
+			</value> //recupero il valore data la chiave e lo aggiorno
+			B:BagItem(_) //( <value> M:Map => updateMap( M , I |-> S  ) </value> ) 
+			//<value> Map => updateValues( B , ( I = S ) ) </value>
+
 		... </values>
 
+		<count> J:Int => J +Int 1 </count>
+		when ( J ==Int L andBool J <=Int X ) //solo quando ci sono ancora value
+
+rule <k> UPDATE N:Id SET I:Id = ' S:Int ' ; => .K ... </k>	
+		<table-name> SetItem(N) </table-name>
+		<numvalues> L:Int </numvalues>
+		<values> ...
+			
+			B:Bag
+
+		... </values>
+
+		<count> J:Int => 0 </count>
+		when ( J >Int L ) //solo quando non ci sono piu value
 
 
 
@@ -272,8 +301,8 @@ rule <k> UPDATE N:Id SET ( S:Substitution , Z:Substitutions ) WHERE ( C:Conditio
 		<table-name> SetItem(N) </table-name>
 		<schema> M:Map </schema>
 		<values> ...
-			
-			<value> Map /* updateValues(B,S,C) */ </value>
+			Bag
+			//<value> Map /* updateValues(B,S,C) */ </value>
 			//come identifico le mappe? devo ciclare sulle mappe in qualche modo 
 			// e chiamare una funzione che controlla la condizione su tutte le mappe 
 			//  e sostituisce i valori sempre su tutte le mappe!
@@ -309,8 +338,13 @@ rule insertValues ( C:Id , S:Columns , V:Value , W:Values , M:Map) => C |-> V in
 rule insertValues( .Columns , .Values , (X:Id |-> T:Type) M:Map) => X |-> null insertValues( .Columns , .Values , M )
 rule insertValues( .Columns , .Values , .Map) => .Map
 
+
+
+
 //aggiorna i valori nelle tuple
-syntax Bag ::= "updateValues" "(" Bag "," Substitution "," Conditions ")"    [function]
+syntax Map ::= "updateValues" "(" BagItem "," Substitution ")"    [function] 
+//rule updateValues( <value> M:Map </value> , I:Id = ' S:Int ' ) =>  updateMap( M , I |-> S ) 
+
 
 
 
@@ -346,14 +380,21 @@ syntax Int ::= "size" "(" Values ")"	[function]
 rule size(V:Value , W:Values) => 1 +Int size(W)
 rule size(.Values) => 0
 
+//calcola la dimensione del bag
+syntax Int ::= "size" "(" Bag ")"   [function]
+rule size(BagItem(_) B:Bag) => 1 +Int size(B)
+rule size(.Bag) => 0
 
+//verifica se l'elemento K è nel bag
+syntax Bool ::= K "in" Bag    [function]
+rule K1 in BagItem(K2) B:Bag => (K1 =K K2) orBool (K1 in B)
+rule _ in .Bag => false
 
+syntax Int ::= "inc" "(" Int ")"	[function]
+rule inc( I:Int ) => I +Int 1
 
-
- syntax Bool ::= K "in" Bag    [function]
-  rule K1 in BagItem(K2) B:Bag => (K1 =K K2) orBool (K1 in B)
-  rule _ in .Bag => false
-
+syntax Int ::= "dec" "(" Int ")"	[function]
+rule dec( I:Int ) => I +Int 1
 
 endmodule
 
