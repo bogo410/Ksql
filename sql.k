@@ -1,4 +1,4 @@
-// Prima implementazione di Sql DENTRO K
+// Core di SQL in K
 
 //sintassi
 module SQL-SYNTAX 
@@ -236,25 +236,44 @@ rule <k> SAVE KEY N:Id ( C:Id , G:Columns ) VALUES ( V:Value , W:Values ) ; => S
 rule <k> SAVE KEY N:Id ( .Columns ) VALUES ( .Values ) ; => .K ... </k>	
 
 // ------ UPDATE ------- //
-rule <k> UPDATE N:Id SET ( S:Substitution , Z:Substitutions ) ; => UPDATE N:Id SET ( Z ) ; ... </k>		
-		<table-name> SetItem(N) </table-name>
-		<schema> M:Map </schema>
-		<values> ...
-			
-			M:Map X |-> T:Type => M[B <- T]
 
+
+
+
+rule <k> UPDATE N:Id SET I:Id = ' S:Int ' ; => .K ... </k>		
+		<table-name> SetItem(N) </table-name>
+		<values> ...
+		
+			 <value> M:Map => updateMap( M , I |-> S ) </value> //recupero il valore data la chiave e lo aggiorno
+			
+			//come identifico le mappe? devo ciclare sulle mappe in qualche modo 
+			// e chiamare una funzione che controlla la condizione su tutte le mappe 
+			//  e sostituisce i valori sempre su tutte le mappe!
+		... </values>
+
+
+
+
+/*
+rule <k> UPDATE N:Id SET ( I:Id = ' S:Int ' , Z:Substitutions => Z ) ; ... </k>		
+		<table-name> SetItem(N) </table-name>
+		<values> ...
+		
+			 <value> M:Map[ I ] => updateMap( M , I |-> S ) </value> //recupero il valore data la chiave e lo aggiorno??
+			
 			//come identifico le mappe? devo ciclare sulle mappe in qualche modo 
 			// e chiamare una funzione che controlla la condizione su tutte le mappe 
 			//  e sostituisce i valori sempre su tutte le mappe!
 		... </values>
 
 rule <k> UPDATE N:Id SET ( .Substitutions ) ; => .K ... </k>	
-
+*/
 rule <k> UPDATE N:Id SET ( S:Substitution , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( Z ) WHERE ( C ) ; ... </k>		
 		<table-name> SetItem(N) </table-name>
 		<schema> M:Map </schema>
 		<values> ...
-			B:Bag => updateValues(B,S,C)
+			
+			<value> Map /* updateValues(B,S,C) */ </value>
 			//come identifico le mappe? devo ciclare sulle mappe in qualche modo 
 			// e chiamare una funzione che controlla la condizione su tutte le mappe 
 			//  e sostituisce i valori sempre su tutte le mappe!
@@ -326,6 +345,9 @@ rule size(.Columns) => 0
 syntax Int ::= "size" "(" Values ")"	[function]
 rule size(V:Value , W:Values) => 1 +Int size(W)
 rule size(.Values) => 0
+
+
+
 
 
  syntax Bool ::= K "in" Bag    [function]

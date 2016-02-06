@@ -10,11 +10,6 @@ where action is one of:
     DROP [ COLUMN ] [ IF EXISTS ] column 										OK
     RENAME [ COLUMN ] column TO new_column										OK
     RENAME TO new_name															OK
-    SET SCHEMA new_schema
-    ALTER [ COLUMN ] column SET DEFAULT expression
-    ALTER [ COLUMN ] column DROP DEFAULT
-    ALTER [ COLUMN ] column { SET | DROP } NOT NULL
-    ALTER [ COLUMN ] column SET ( attribute_option = value [, ... ] )
 
 // ---- INSERT INTO ---- //
 
@@ -22,12 +17,11 @@ INSERT INTO table [( column [, ... ] ) ]
 	{ ( values [, ... ] }
 	
 
- //sono comandi avanzati non so se bisogna farli
- "alter table nometable alter column nomecolonna set default
- "alter table nometable alter column nomecolonna set not null
- "alter table nometable alter column nomecolonna drop default
- "alter table nometable alter column nomecolonna drop not null
+// ———- UPDATE ———- //
+
+UPDATE nometabella SET nomecolonna = …
+UPDATE numetabella SET nomecolonna = … WHERE nomecolonna = …
 
 
 // ---- PROBLEMI DEL FILE CORRENTE .K ---- //
-//DROP e ADD non si possono fare assieme
+// non si riesce a ciclare sui bag.
