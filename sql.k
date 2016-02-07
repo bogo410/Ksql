@@ -77,6 +77,7 @@ syntax Exp ::= Int | Bool | String | Id
 
 syntax Exps ::= List{Exp,","}          [strict]
 
+//sostituzioni dell'update
 syntax Substitution ::=	Id "=" "null"
 					|	Id "=" Exp
 					|	Id "=" "'" String "'"
@@ -84,6 +85,7 @@ syntax Substitution ::=	Id "=" "null"
 
 syntax Substitutions ::=	List{Substitution,","}
 
+//condini per l'update
 syntax Condition ::=	Id "=" "'" String "'"
 					|	Id "=" "'" Int "'"
 					|	Id "=" Exp
@@ -139,6 +141,7 @@ rule S1:Stmt S2:Stmts => S1 ~> S2
 //crea il database
 rule <k> CREATE DATABASE N:Id ; => .K ... </k>
 	<database-name> .Set => SetItem(N) </database-name>
+	<count> J:Int => 0 </count>
 
 // ------ CREATE TABLE  ------- //
 //crea la tabella senza attributi
@@ -248,10 +251,7 @@ rule <k> SAVE KEY N:Id ( C:Id , G:Columns ) VALUES ( V:Value , W:Values ) ; => S
 rule <k> SAVE KEY N:Id ( .Columns ) VALUES ( .Values ) ; => .K ... </k>	
 
 // ------ UPDATE ------- //
-
-
-
-
+//update semplice per interi
 rule <k> UPDATE N:Id SET I:Id = ' S:Int ' ; => UPDATE N:Id SET I:Id = ' S:Int ' ; ... </k>		
 		<table-name> SetItem(N) </table-name>
 		<numvalues> X:Int </numvalues>
@@ -259,27 +259,33 @@ rule <k> UPDATE N:Id SET I:Id = ' S:Int ' ; => UPDATE N:Id SET I:Id = ' S:Int ' 
 
 			<value> 
 				<numvalue> L:Int </numvalue>
-				<val> M:Map => updateMap( M , I |-> S ) </val> 
-			</value> //recupero il valore data la chiave e lo aggiorno
-			B:BagItem(_) //( <value> M:Map => updateMap( M , I |-> S  ) </value> ) 
-			//<value> Map => updateValues( B , ( I = S ) ) </value>
+				<val> M:Map => updateMap( M , I |-> S ) </val>	//recupera il valore data la chiave e lo aggiorna
+			</value>
 
 		... </values>
-
 		<count> J:Int => J +Int 1 </count>
-		when ( J ==Int L andBool J <=Int X ) //solo quando ci sono ancora value
+		when ( inc(J) ==Int L andBool J <=Int X )	//solo quando ci sono ancora value
 
-rule <k> UPDATE N:Id SET I:Id = ' S:Int ' ; => .K ... </k>	
+//update semplice per stringhe
+rule <k> UPDATE N:Id SET I:Id = ' S:String ' ; => UPDATE N:Id SET I:Id = ' S:String ' ; ... </k>		
+		<table-name> SetItem(N) </table-name>
+		<numvalues> X:Int </numvalues>
+		<values> ...
+
+			<value> 
+				<numvalue> L:Int </numvalue>
+				<val> M:Map => updateMap( M , I |-> S ) </val>	//recupera il valore data la chiave e lo aggiorna
+			</value>
+
+		... </values>
+		<count> J:Int => J +Int 1 </count>
+		when ( inc(J) ==Int L andBool J <=Int X )	//solo quando ci sono ancora value
+
+rule <k> UPDATE N:Id SET _ ; => .K ... </k>	
 		<table-name> SetItem(N) </table-name>
 		<numvalues> L:Int </numvalues>
-		<values> ...
-			
-			B:Bag
-
-		... </values>
-
-		<count> J:Int => 0 </count>
-		when ( J >Int L ) //solo quando non ci sono piu value
+		<count> J:Int => 0 </count>	//azzera il contatore
+		when ( inc(J) >Int L )	//solo quando non ci sono piu value
 
 
 
@@ -307,9 +313,6 @@ rule <k> UPDATE N:Id SET ( S:Substitution , Z:Substitutions ) WHERE ( C:Conditio
 			// e chiamare una funzione che controlla la condizione su tutte le mappe 
 			//  e sostituisce i valori sempre su tutte le mappe!
 		... </values> 
-
-
-
 /*
 
 syntax Substitution ::=	Id "=" "null"
@@ -337,17 +340,6 @@ syntax Map ::= "insertValues" "(" Columns "," Values "," Map ")"    [function]
 rule insertValues ( C:Id , S:Columns , V:Value , W:Values , M:Map) => C |-> V insertValues( S , W , M -Map (C |-> (M[C])))
 rule insertValues( .Columns , .Values , (X:Id |-> T:Type) M:Map) => X |-> null insertValues( .Columns , .Values , M )
 rule insertValues( .Columns , .Values , .Map) => .Map
-
-
-
-
-//aggiorna i valori nelle tuple
-syntax Map ::= "updateValues" "(" BagItem "," Substitution ")"    [function] 
-//rule updateValues( <value> M:Map </value> , I:Id = ' S:Int ' ) =>  updateMap( M , I |-> S ) 
-
-
-
-
 
 //controlla che la stringa inserita sia entro la lunghezza definita in CREATE TABLE
 syntax Bool ::= "charControl" "(" Map "," Columns "," Values ")"	[function]
@@ -390,9 +382,11 @@ syntax Bool ::= K "in" Bag    [function]
 rule K1 in BagItem(K2) B:Bag => (K1 =K K2) orBool (K1 in B)
 rule _ in .Bag => false
 
+//incrementa una variabile intera
 syntax Int ::= "inc" "(" Int ")"	[function]
 rule inc( I:Int ) => I +Int 1
 
+//decrementa una variabile intera
 syntax Int ::= "dec" "(" Int ")"	[function]
 rule dec( I:Int ) => I +Int 1
 
