@@ -10,9 +10,9 @@ UPDATE Prova SET Try = '20' , Pry = '"def"';
 
 UPDATE Prova SET Try = '10';
 UPDATE Prova SET Pry = '"miao"';
-UPDATE Prova SET Cry = '"biao"';
+UPDATE Prova SET Cry = null;
 
 //UPDATE Prova SET Cry = '5';
 //UPDATE Prova SET Pry = '"miao5678910"';
 
-UPDATE Prova SET Try = '20' , Pry = '"def"';
+UPDATE Prova SET Try = null , Pry = null;

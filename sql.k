@@ -287,6 +287,24 @@ rule <k> UPDATE N:Id SET ( I:Id = ' S:String ' , Z:Substitutions ) ; => UPDATE N
 		//solo quando ci sono ancora value, il tipo inserito è corretto e la stringa è accettabile
 		when ( inc(J) ==Int L andBool J <=Int X andBool typeCheck( O , I , VARCHAR(0) , S ) )
 
+//update semplice per i valori nulli
+rule <k> UPDATE N:Id SET ( I:Id = null , Z:Substitutions ) ; => UPDATE N:Id SET ( I:Id = null , Z:Substitutions ) ; ... </k>		
+		<table-name> SetItem(N) </table-name>
+		<schema> O:Map </schema>
+		<numvalues> X:Int </numvalues>
+		<values> ...
+
+			<value> 
+				<numvalue> L:Int </numvalue>
+				<val> M:Map => updateMap( M , I |-> null ) </val>	//recupera il valore data la chiave e lo aggiorna
+			</value>
+
+		... </values>
+		<count> J:Int => J +Int 1 </count>
+		//solo quando ci sono ancora value
+		when ( inc(J) ==Int L andBool J <=Int X )
+
+//se ha finito l'update della prima sostituzione passa alle successive
 rule <k> UPDATE N:Id SET ( _ , Z:Substitutions ) ; => UPDATE N:Id SET ( Z ) ; ... </k>	
 		<table-name> SetItem(N) </table-name>
 		<numvalues> L:Int </numvalues>
@@ -295,29 +313,14 @@ rule <k> UPDATE N:Id SET ( _ , Z:Substitutions ) ; => UPDATE N:Id SET ( Z ) ; ..
 
 rule <k> UPDATE N:Id SET .Substitutions ; => .K ... </k>	
 
-/*
-rule <k> UPDATE N:Id SET ( I:Id = ' S:Int ' , Z:Substitutions => Z ) ; ... </k>		
-		<table-name> SetItem(N) </table-name>
-		<values> ...
-		
-			 <value> M:Map[ I ] => updateMap( M , I |-> S ) </value> //recupero il valore data la chiave e lo aggiorno??
-			
-			//come identifico le mappe? devo ciclare sulle mappe in qualche modo 
-			// e chiamare una funzione che controlla la condizione su tutte le mappe 
-			//  e sostituisce i valori sempre su tutte le mappe!
-		... </values>
-
-rule <k> UPDATE N:Id SET ( .Substitutions ) ; => .K ... </k>	
-*/
+//update complessa
 rule <k> UPDATE N:Id SET ( S:Substitution , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( Z ) WHERE ( C ) ; ... </k>		
 		<table-name> SetItem(N) </table-name>
 		<schema> M:Map </schema>
 		<values> ...
+			
 			Bag
-			//<value> Map /* updateValues(B,S,C) */ </value>
-			//come identifico le mappe? devo ciclare sulle mappe in qualche modo 
-			// e chiamare una funzione che controlla la condizione su tutte le mappe 
-			//  e sostituisce i valori sempre su tutte le mappe!
+
 		... </values> 
 /*
 
