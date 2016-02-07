@@ -254,7 +254,7 @@ rule <k> SAVE KEY N:Id ( .Columns ) VALUES ( .Values ) ; => .K ... </k>
 
 // ------ UPDATE ------- //
 //update semplice per interi
-rule <k> UPDATE N:Id SET I:Id = ' S:Int ' ; => UPDATE N:Id SET I:Id = ' S:Int ' ; ... </k>		
+rule <k> UPDATE N:Id SET ( I:Id = ' S:Int ' , Z:Substitutions ) ; => UPDATE N:Id SET ( I:Id = ' S:Int ' , Z:Substitutions ) ; ... </k>		
 		<table-name> SetItem(N) </table-name>
 		<schema> O:Map </schema>
 		<numvalues> X:Int </numvalues>
@@ -267,10 +267,11 @@ rule <k> UPDATE N:Id SET I:Id = ' S:Int ' ; => UPDATE N:Id SET I:Id = ' S:Int ' 
 
 		... </values>
 		<count> J:Int => J +Int 1 </count>
-		when ( inc(J) ==Int L andBool J <=Int X andBool typeCheck( O , I , SMALLINT , "null" ) )	//solo quando ci sono ancora value
+		//solo quando ci sono ancora value e il tipo inserito è corretto
+		when ( inc(J) ==Int L andBool J <=Int X andBool typeCheck( O , I , SMALLINT , "null" ) )
 
 //update semplice per stringhe
-rule <k> UPDATE N:Id SET I:Id = ' S:String ' ; => UPDATE N:Id SET I:Id = ' S:String ' ; ... </k>		
+rule <k> UPDATE N:Id SET ( I:Id = ' S:String ' , Z:Substitutions ) ; => UPDATE N:Id SET ( I:Id = ' S:String ' , Z:Substitutions ) ; ... </k>		
 		<table-name> SetItem(N) </table-name>
 		<schema> O:Map </schema>
 		<numvalues> X:Int </numvalues>
@@ -283,15 +284,16 @@ rule <k> UPDATE N:Id SET I:Id = ' S:String ' ; => UPDATE N:Id SET I:Id = ' S:Str
 
 		... </values>
 		<count> J:Int => J +Int 1 </count>
-		when ( inc(J) ==Int L andBool J <=Int X andBool typeCheck( O , I , VARCHAR(0) , S ) )	//solo quando ci sono ancora value
+		//solo quando ci sono ancora value, il tipo inserito è corretto e la stringa è accettabile
+		when ( inc(J) ==Int L andBool J <=Int X andBool typeCheck( O , I , VARCHAR(0) , S ) )
 
-rule <k> UPDATE N:Id SET _ ; => .K ... </k>	
+rule <k> UPDATE N:Id SET ( _ , Z:Substitutions ) ; => UPDATE N:Id SET ( Z ) ; ... </k>	
 		<table-name> SetItem(N) </table-name>
 		<numvalues> L:Int </numvalues>
 		<count> J:Int => 0 </count>	//azzera il contatore
 		when ( inc(J) >Int L )	//solo quando non ci sono piu value
 
-
+rule <k> UPDATE N:Id SET .Substitutions ; => .K ... </k>	
 
 /*
 rule <k> UPDATE N:Id SET ( I:Id = ' S:Int ' , Z:Substitutions => Z ) ; ... </k>		
