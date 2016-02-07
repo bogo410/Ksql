@@ -62,18 +62,20 @@ syntax Tables ::= 	List{Id,","}
 
 syntax RenameTable ::=	"RENAME TO" Id
 
-syntax Exp ::= Int | Bool | String | Id
-               | "(" Exp ")"             [bracket]
-               | "-" Exp                 [strict]
-               > left:
-                 Exp "*" Exp             [strict, left]
-               | Exp "/" Exp             [strict, left]
-               > left:
-                 Exp "+" Exp             [strict, left]
-               | Exp "-" Exp             [strict, left]
-               > left:
-                 Exp "AND" Exp            [strict(1), left]
-               | Exp "OR" Exp            [strict(1), left]
+syntax Ktype ::=	Int | String
+
+syntax Exp ::=	Bool | Ktype | Id
+               	| "(" Exp ")"             [bracket]
+               	| "-" Exp                 [strict]
+               	> left:
+                  Exp "*" Exp             [strict, left]
+               	| Exp "/" Exp             [strict, left]
+               	> left:
+                  Exp "+" Exp             [strict, left]
+               	| Exp "-" Exp             [strict, left]
+               	> left:
+                  Exp "AND" Exp            [strict(1), left]
+               	| Exp "OR" Exp            [strict(1), left]
 
 syntax Exps ::= List{Exp,","}          [strict]
 
@@ -254,6 +256,7 @@ rule <k> SAVE KEY N:Id ( .Columns ) VALUES ( .Values ) ; => .K ... </k>
 //update semplice per interi
 rule <k> UPDATE N:Id SET I:Id = ' S:Int ' ; => UPDATE N:Id SET I:Id = ' S:Int ' ; ... </k>		
 		<table-name> SetItem(N) </table-name>
+		<schema> O:Map </schema>
 		<numvalues> X:Int </numvalues>
 		<values> ...
 
@@ -264,11 +267,12 @@ rule <k> UPDATE N:Id SET I:Id = ' S:Int ' ; => UPDATE N:Id SET I:Id = ' S:Int ' 
 
 		... </values>
 		<count> J:Int => J +Int 1 </count>
-		when ( inc(J) ==Int L andBool J <=Int X )	//solo quando ci sono ancora value
+		when ( inc(J) ==Int L andBool J <=Int X andBool typeCheck( O , I , SMALLINT , "null" ) )	//solo quando ci sono ancora value
 
 //update semplice per stringhe
 rule <k> UPDATE N:Id SET I:Id = ' S:String ' ; => UPDATE N:Id SET I:Id = ' S:String ' ; ... </k>		
 		<table-name> SetItem(N) </table-name>
+		<schema> O:Map </schema>
 		<numvalues> X:Int </numvalues>
 		<values> ...
 
@@ -279,7 +283,7 @@ rule <k> UPDATE N:Id SET I:Id = ' S:String ' ; => UPDATE N:Id SET I:Id = ' S:Str
 
 		... </values>
 		<count> J:Int => J +Int 1 </count>
-		when ( inc(J) ==Int L andBool J <=Int X )	//solo quando ci sono ancora value
+		when ( inc(J) ==Int L andBool J <=Int X andBool typeCheck( O , I , VARCHAR(0) , S ) )	//solo quando ci sono ancora value
 
 rule <k> UPDATE N:Id SET _ ; => .K ... </k>	
 		<table-name> SetItem(N) </table-name>
@@ -341,6 +345,18 @@ rule insertValues ( C:Id , S:Columns , V:Value , W:Values , M:Map) => C |-> V in
 rule insertValues( .Columns , .Values , (X:Id |-> T:Type) M:Map) => X |-> null insertValues( .Columns , .Values , M )
 rule insertValues( .Columns , .Values , .Map) => .Map
 
+//controlla che il tipo sia quello giusto nello schema della tabella
+syntax Bool ::= "typeCheck" "(" Map "," Id "," Type "," String ")"	[function]
+rule typeCheck( (X:Id |-> T:Type) M:Map , I:Id , S:Type , _ ) => #if ( (X ==K I) andBool (T ==K S) ) #then true #else typeCheck( M , I , S , "null") #fi
+rule typeCheck( (X:Id |-> T:Type) M:Map , I:Id , VARCHAR(_) , Z:String ) => #if ((X ==K I) andBool ((VARCHAR(charNumber( Z , T )) ==K T) orBool VARCHAR ==K T)) 
+																			#then true #else typeCheck( M , I , VARCHAR(0) , Z ) #fi
+rule typeCheck( .Map , _ , _ , _) => false
+
+//ritorna l'intero del campo del VARCHAR in questione se la stringa passata è entro tale intero
+syntax Int ::= "charNumber" "(" String "," Type ")"	[function]
+rule charNumber( S:String , VARCHAR ( I:Int )) => I
+		when ( I >=Int lengthString(S) )
+
 //controlla che la stringa inserita sia entro la lunghezza definita in CREATE TABLE
 syntax Bool ::= "charControl" "(" Map "," Columns "," Values ")"	[function]
 rule charControl( M:Map , I:Id , C:Columns , ' S:String ' , V:Values ) => #if ( control( S , M[I]) ) #then ( charControl( M , C , V ) ) #else false #fi
@@ -355,7 +371,8 @@ rule control( S:String , VARCHAR ) => true
 
 //controlla che si faccia l'inserimento dell'attributo chiave se esiste una primary key nella tabella
 syntax Bool ::=	"checkKey" "(" Columns "," Set "," Values "," Set ")"	[function]
-rule checkKey( C:Id , G:Columns , Z:Set , V:Value , W:Values , S:Set ) => #if ( (C in Z) orBool (Z ==K .Set) ) #then ( isNotAlreadyIn( C , V , S ) ) #else ( checkKey( G , Z , W , S ) ) #fi
+rule checkKey( C:Id , G:Columns , Z:Set , V:Value , W:Values , S:Set ) => #if ( (C in Z) orBool (Z ==K .Set) ) 
+																		  #then ( isNotAlreadyIn( C , V , S ) ) #else ( checkKey( G , Z , W , S ) ) #fi
 rule checkKey( C:Columns, .Set , _ , _ , _ ) => true	//se la primary key non esiste nella tabella va bene
 
 //controlla se la chiave inserita esiste gia

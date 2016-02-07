@@ -12,11 +12,11 @@ context-free priorities
     Id -> Exp {}
     "-" Exp -> Exp {cons("Exp1256Syn")}
 } > { left:
-    Exp "*" Exp -> Exp {left, cons("Exp1496Syn")}
+    Exp "*" Exp -> Exp {left, cons("Exp1497Syn")}
     Exp "/" Exp -> Exp {left, cons("Exp1532Syn")}
 } > { left:
-    Exp "+" Exp -> Exp {left, cons("Exp1489Syn")}
-    Exp "-" Exp -> Exp {left, cons("Exp1479Syn")}
+    Exp "+" Exp -> Exp {left, cons("Exp1490Syn")}
+    Exp "-" Exp -> Exp {left, cons("Exp1480Syn")}
 } > { left:
     Exp "AND" Exp -> Exp {left, cons("Exp1309Syn")}
     Exp "OR" Exp -> Exp {left, cons("Exp1430Syn")}
@@ -61,7 +61,7 @@ context-free syntax
     "DROP TABLE" InsertDzTables ";" -> Stmt {cons("Stmt1352Syn")}
     "AND" -> AndOr {cons("AndOr1282Syn")}
     {AlterCommand ","}* -> AlterCommands {cons("AlterCommands1ListSyn")}
-    "OR" -> AndOr {cons("AndOr1238Syn")}
+    "OR" -> AndOr {cons("AndOr1239Syn")}
     Id Type -> Attribute {cons("Attribute1354Syn")}
     Id "=" "null" -> Substitution {cons("Substitution142Syn")}
     DzInt -> Int {}
