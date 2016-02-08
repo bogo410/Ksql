@@ -284,7 +284,11 @@ rule <k> UPDATE N:Id SET ( I:Id = ' S:String ' , Z:Substitutions ) ; => UPDATE N
 		... </values>
 		<count> J:Int => J +Int 1 </count>
 		//solo quando ci sono ancora value, il tipo inserito è corretto e la stringa è accettabile
+<<<<<<< HEAD
 		when ( inc(J) ==Int L andBool J <=Int X andBool typeChecker( O , I , VARCHAR(100) , S ) )
+=======
+		when ( inc(J) ==Int L andBool J <=Int X andBool typeCheck( O , I , VARCHAR(100) , S ) )
+>>>>>>> origin/master
 
 //update semplice per i valori nulli
 rule <k> UPDATE N:Id SET ( I:Id = null , Z:Substitutions ) ; => UPDATE N SET ( I = null , Z ) ; ... </k>		
@@ -348,10 +352,17 @@ rule insertValues( .Columns , .Values , (X:Id |-> T:Type) M:Map) => X |-> null i
 rule insertValues( .Columns , .Values , .Map) => .Map
 
 //controlla che il tipo sia quello giusto nello schema della tabella
+<<<<<<< HEAD
 syntax Bool ::= "typeChecker" "(" Map "," Id "," Type "," String ")"	[function]
 rule typeChecker( (X:Id |-> T:Type) M:Map , I:Id , SMALLINT , _ ) => #if ( (X ==K I) andBool (T ==K SMALLINT) ) #then true #else typeChecker( M , I , SMALLINT , "null") #fi
 rule typeChecker( (X:Id |-> T:Type) M:Map , I:Id , VARCHAR(_) , Z:String ) => #if ((X ==K I) andBool ((VARCHAR(charNumber( Z , T )) ==K T) orBool VARCHAR ==K T)) #then true #else typeChecker( M , I , VARCHAR(100) , Z ) #fi
 rule typeChecker( .Map , _ , _ , _) => false
+=======
+syntax Bool ::= "typeCheck" "(" Map "," Id "," Type "," String ")"	[function]
+rule typeCheck( (X:Id |-> T:Type) M:Map , I:Id , S:Type , _ ) => #if ( (X ==K I) andBool (T ==K S) ) #then true #else typeCheck( M , I , S , "null") #fi
+rule typeCheck( (X:Id |-> T:Type) M:Map , I:Id , VARCHAR(_) , Z:String ) => #if ((X ==K I) andBool ((VARCHAR(charNumber( Z , T )) ==K T) orBool VARCHAR ==K T)) #then true #else typeCheck( M , I , VARCHAR(100) , Z ) #fi
+rule typeCheck( .Map , _ , _ , _) => false
+>>>>>>> origin/master
 
 //ritorna l'intero del campo del VARCHAR in questione se la stringa passata è entro tale intero
 syntax Int ::= "charNumber" "(" String "," Type ")"	[function]
