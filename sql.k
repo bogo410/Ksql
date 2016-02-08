@@ -285,7 +285,7 @@ rule <k> UPDATE N:Id SET ( I:Id = ' S:String ' , Z:Substitutions ) ; => UPDATE N
 		... </values>
 		<count> J:Int => J +Int 1 </count>
 		//solo quando ci sono ancora value, il tipo inserito è corretto e la stringa è accettabile
-		when ( inc(J) ==Int L andBool J <=Int X andBool typeCheck( O , I , VARCHAR(0) , S ) )
+		when ( inc(J) ==Int L andBool J <=Int X andBool typeCheck( O , I , VARCHAR(100) , S ) )
 
 //update semplice per i valori nulli
 rule <k> UPDATE N:Id SET ( I:Id = null , Z:Substitutions ) ; => UPDATE N SET ( I = null , Z ) ; ... </k>		
@@ -353,7 +353,7 @@ rule insertValues( .Columns , .Values , .Map) => .Map
 //controlla che il tipo sia quello giusto nello schema della tabella
 syntax Bool ::= "typeCheck" "(" Map "," Id "," Type "," String ")"	[function]
 rule typeCheck( (X:Id |-> T:Type) M:Map , I:Id , S:Type , _ ) => #if ( (X ==K I) andBool (T ==K S) ) #then true #else typeCheck( M , I , S , "null") #fi
-rule typeCheck( (X:Id |-> T:Type) M:Map , I:Id , VARCHAR(_) , Z:String ) => #if ((X ==K I) andBool ((VARCHAR(charNumber( Z , T )) ==K T) orBool VARCHAR ==K T)) #then true #else typeCheck( M , I , VARCHAR(0) , Z ) #fi
+rule typeCheck( (X:Id |-> T:Type) M:Map , I:Id , VARCHAR(_) , Z:String ) => #if ((X ==K I) andBool ((VARCHAR(charNumber( Z , T )) ==K T) orBool VARCHAR ==K T)) #then true #else typeCheck( M , I , VARCHAR(100) , Z ) #fi
 rule typeCheck( .Map , _ , _ , _) => false
 
 //ritorna l'intero del campo del VARCHAR in questione se la stringa passata è entro tale intero
