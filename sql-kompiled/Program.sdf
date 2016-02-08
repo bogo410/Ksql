@@ -10,16 +10,16 @@ context-free priorities
     Bool -> Exp {}
     Ktype -> Exp {}
     Id -> Exp {}
-    "-" Exp -> Exp {cons("Exp1256Syn")}
+    "-" Exp -> Exp {cons("Exp1257Syn")}
 } > { left:
-    Exp "*" Exp -> Exp {left, cons("Exp1496Syn")}
-    Exp "/" Exp -> Exp {left, cons("Exp1532Syn")}
+    Exp "*" Exp -> Exp {left, cons("Exp1497Syn")}
+    Exp "/" Exp -> Exp {left, cons("Exp1533Syn")}
 } > { left:
-    Exp "+" Exp -> Exp {left, cons("Exp1489Syn")}
-    Exp "-" Exp -> Exp {left, cons("Exp1479Syn")}
+    Exp "+" Exp -> Exp {left, cons("Exp1490Syn")}
+    Exp "-" Exp -> Exp {left, cons("Exp1480Syn")}
 } > { left:
-    Exp "AND" Exp -> Exp {left, cons("Exp1309Syn")}
-    Exp "OR" Exp -> Exp {left, cons("Exp1430Syn")}
+    Exp "AND" Exp -> Exp {left, cons("Exp1322Syn")}
+    Exp "OR" Exp -> Exp {left, cons("Exp1432Syn")}
 }
 
 context-free start-symbols
@@ -27,63 +27,62 @@ Add AddAttribute Stmts RenameColumnAttribute Attribute AddAttributes Attributes 
 context-free syntax
     "CREATE DATABASE" InsertDzId ";" -> Stmt {cons("Stmt165Syn")}
     DzString -> String {}
-    "DROP COLUMN IF EXISTS" -> Ddrop {cons("Ddrop1449Syn")}
-    "CREATE TABLE" InsertDzId "(" InsertDzAttributes ")" ";" -> Stmt {cons("Stmt1528Syn")}
-    Stmt Stmts -> Stmts {cons("Stmts1450Syn")}
+    "DROP COLUMN IF EXISTS" -> Ddrop {cons("Ddrop1450Syn")}
+    "CREATE TABLE" InsertDzId "(" InsertDzAttributes ")" ";" -> Stmt {cons("Stmt1529Syn")}
+    Stmt Stmts -> Stmts {cons("Stmts1452Syn")}
     {Id ","}* -> Tables {cons("Tables1ListSyn")}
     RenameColumnAttribute -> AlterCommand {}
-    "UPDATE" InsertDzId "SET" InsertDzSubstitutions ";" -> Stmt {cons("Stmt1457Syn")}
-    "null" -> Value {cons("Value1223Syn")}
+    "UPDATE" InsertDzId "SET" InsertDzSubstitutions ";" -> Stmt {cons("Stmt1458Syn")}
+    "null" -> Value {cons("Value1224Syn")}
     Add Attribute -> AddAttribute {cons("AddAttribute15Syn")}
+    Id "=" "null" -> Condition {cons("Condition1226Syn")}
     DzFloat -> Float {}
-    Id "=" "'" InsertDzInt "'" -> Condition {cons("Condition1536Syn")}
+    Id "=" "'" InsertDzInt "'" -> Condition {cons("Condition1537Syn")}
     String -> Ktype {}
     Int -> Value {}
     Conditions InsertDzAndOr Conditions -> Conditions {cons("Conditions122Syn")}
     "DROP IF EXISTS" -> Ddrop {cons("Ddrop124Syn")}
-    "ALTER TABLE" InsertDzId InsertDzAlterCommands ";" -> Stmt {cons("Stmt1338Syn")}
+    "ALTER TABLE" InsertDzId InsertDzAlterCommands ";" -> Stmt {cons("Stmt1340Syn")}
     AddAttribute -> AlterCommand {}
-    "VARCHAR" "(" InsertDzInt ")" -> Type {cons("Type1339Syn")}
-    "ADD SCHEMA" InsertDzId "(" InsertDzAttributes ")" ";" -> Command {cons("Command1542Syn")}
-    Id "=" Exp -> Condition {cons("Condition1543Syn")}
+    "VARCHAR" "(" InsertDzInt ")" -> Type {cons("Type1342Syn")}
+    "ADD SCHEMA" InsertDzId "(" InsertDzAttributes ")" ";" -> Command {cons("Command1543Syn")}
     DzBool -> Bool {}
     "RENAME TO" Id -> RenameTable {cons("RenameTable1546Syn")}
     "(" InsertDzExp ")" -> Exp {cons("Exp1Bracket")}
-    "SMALLINT" -> Type {cons("Type1472Syn")}
-    "UPDATE" InsertDzId "SET" InsertDzSubstitutions "WHERE" InsertDzConditions ";" -> Stmt {cons("Stmt182Syn")}
+    "SMALLINT" -> Type {cons("Type1473Syn")}
+    "UPDATE" InsertDzId "SET" InsertDzSubstitutions "WHERE" InsertDzConditions ";" -> Stmt {cons("Stmt183Syn")}
     {Value ","}* -> Values {cons("Values1ListSyn")}
-    "INSERT INTO" InsertDzId "(" InsertDzColumns ")" "VALUES" "(" InsertDzValues ")" ";" -> Stmt {cons("Stmt1474Syn")}
+    "INSERT INTO" InsertDzId "(" InsertDzColumns ")" "VALUES" "(" InsertDzValues ")" ";" -> Stmt {cons("Stmt1475Syn")}
     {AddAttribute ","}* -> AddAttributes {cons("AddAttributes1ListSyn")}
     "VARCHAR" -> Type {cons("Type133Syn")}
     DdropAttribute -> AlterCommand {}
     "ADD" -> Add {cons("Add1550Syn")}
-    "DROP COLUMN" -> Ddrop {cons("Ddrop1280Syn")}
-    "DROP TABLE" InsertDzTables ";" -> Stmt {cons("Stmt1352Syn")}
-    "AND" -> AndOr {cons("AndOr1282Syn")}
+    "DROP COLUMN" -> Ddrop {cons("Ddrop1283Syn")}
+    "DROP TABLE" InsertDzTables ";" -> Stmt {cons("Stmt1354Syn")}
+    "AND" -> AndOr {cons("AndOr1284Syn")}
     {AlterCommand ","}* -> AlterCommands {cons("AlterCommands1ListSyn")}
-    "OR" -> AndOr {cons("AndOr1238Syn")}
-    Id Type -> Attribute {cons("Attribute1354Syn")}
+    "OR" -> AndOr {cons("AndOr1240Syn")}
+    Id Type -> Attribute {cons("Attribute1356Syn")}
     Id "=" "null" -> Substitution {cons("Substitution142Syn")}
     DzInt -> Int {}
-    Id "=" Exp -> Substitution {cons("Substitution1428Syn")}
     Stmt -> Stmts {}
     RenameTable -> AlterCommand {}
     Id InsertDzType "PRIMARY KEY" -> Attribute {cons("Attribute147Syn")}
     {Id ","}* -> Columns {cons("Columns1ListSyn")}
     {DdropAttribute ","}* -> DdropAttributes {cons("DdropAttributes1ListSyn")}
-    Id "=" "'" InsertDzString "'" -> Condition {cons("Condition1563Syn")}
-    "'" InsertDzString "'" -> Value {cons("Value1296Syn")}
-    Id "=" "'" InsertDzString "'" -> Substitution {cons("Substitution1435Syn")}
+    Id "=" "'" InsertDzString "'" -> Condition {cons("Condition1564Syn")}
+    "'" InsertDzString "'" -> Value {cons("Value1298Syn")}
+    Id "=" "'" InsertDzString "'" -> Substitution {cons("Substitution1436Syn")}
     {Substitution ","}* -> Substitutions {cons("Substitutions1ListSyn")}
-    Ddrop Id -> DdropAttribute {cons("DdropAttribute1439Syn")}
+    Ddrop Id -> DdropAttribute {cons("DdropAttribute1440Syn")}
     Int -> Ktype {}
-    "ADD COLUMN" -> Add {cons("Add1258Syn")}
+    "ADD COLUMN" -> Add {cons("Add1259Syn")}
     Condition -> Conditions {}
-    "SAVE KEY" InsertDzId "(" InsertDzColumns ")" "VALUES" "(" InsertDzValues ")" ";" -> Command {cons("Command1365Syn")}
+    "SAVE KEY" InsertDzId "(" InsertDzColumns ")" "VALUES" "(" InsertDzValues ")" ";" -> Command {cons("Command1367Syn")}
     {Exp ","}* -> Exps {cons("Exps1ListSyn")}
     {RenameColumnAttribute ","}* -> RenameColumnAttributes {cons("RenameColumnAttributes1ListSyn")}
-    "RENAME COLUMN" InsertDzId "TO" Id -> RenameColumnAttribute {cons("RenameColumnAttribute1444Syn")}
-    "DROP" -> Ddrop {cons("Ddrop1572Syn")}
+    "RENAME COLUMN" InsertDzId "TO" Id -> RenameColumnAttribute {cons("RenameColumnAttribute1445Syn")}
+    "DROP" -> Ddrop {cons("Ddrop1573Syn")}
     {Attribute ","}* -> Attributes {cons("Attributes1ListSyn")}
     Id "=" "'" InsertDzInt "'" -> Substitution {cons("Substitution164Syn")}
     AlterCommands -> InsertDzAlterCommands

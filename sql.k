@@ -81,16 +81,15 @@ syntax Exps ::= List{Exp,","}          [strict]
 
 //sostituzioni dell'update
 syntax Substitution ::=	Id "=" "null"
-					|	Id "=" Exp
 					|	Id "=" "'" String "'"
 					|	Id "=" "'" Int "'"
 
 syntax Substitutions ::=	List{Substitution,","}
 
 //condini per l'update
-syntax Condition ::=	Id "=" "'" String "'"
+syntax Condition ::=	Id "=" "null"
+					|	Id "=" "'" String "'"
 					|	Id "=" "'" Int "'"
-					|	Id "=" Exp
 
 syntax Conditions ::=	Condition
 					|	Conditions AndOr Conditions
@@ -268,7 +267,7 @@ rule <k> UPDATE N:Id SET ( I:Id = ' S:Int ' , Z:Substitutions ) ; => UPDATE N SE
 		... </values>
 		<count> J:Int => J +Int 1 </count>
 		//solo quando ci sono ancora value e il tipo inserito è corretto
-		when ( inc(J) ==Int L andBool J <=Int X andBool typeCheck( O , I , SMALLINT , "null" ) )
+		when ( inc(J) ==Int L andBool J <=Int X andBool typeChecker( O , I , SMALLINT , "null" ) )
 
 //update semplice per stringhe
 rule <k> UPDATE N:Id SET ( I:Id = ' S:String ' , Z:Substitutions ) ; => UPDATE N SET ( I = ' S ' , Z ) ; ... </k>		
@@ -279,13 +278,13 @@ rule <k> UPDATE N:Id SET ( I:Id = ' S:String ' , Z:Substitutions ) ; => UPDATE N
 
 			<value> 
 				<numvalue> L:Int </numvalue>
-				<val> M:Map => updateMap( M , I |-> S ) </val>	//recupera il valore data la chiave e lo aggiorna
+				<val> M:Map => updateMap( M , I |-> ' S ' ) </val>	//recupera il valore data la chiave e lo aggiorna
 			</value>
 
 		... </values>
 		<count> J:Int => J +Int 1 </count>
 		//solo quando ci sono ancora value, il tipo inserito è corretto e la stringa è accettabile
-		when ( inc(J) ==Int L andBool J <=Int X andBool typeCheck( O , I , VARCHAR(0) , S ) )
+		when ( inc(J) ==Int L andBool J <=Int X andBool typeChecker( O , I , VARCHAR(100) , S ) )
 
 //update semplice per i valori nulli
 rule <k> UPDATE N:Id SET ( I:Id = null , Z:Substitutions ) ; => UPDATE N SET ( I = null , Z ) ; ... </k>		
@@ -312,36 +311,34 @@ rule <k> UPDATE N:Id SET ( _ , Z:Substitutions ) ; => UPDATE N:Id SET ( Z ) ; ..
 		when ( inc(J) >Int L )	//solo quando non ci sono piu value
 
 rule <k> UPDATE N:Id SET .Substitutions ; => .K ... </k>	
+		//<count> J:Int => 0 </count>	//azzera il contatore
 
-//update complessa
-rule <k> UPDATE N:Id SET ( S:Substitution , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( Z ) WHERE ( C ) ; ... </k>		
+//update complessa per interi
+rule <k> UPDATE N:Id SET ( I:Id = ' S:Int ' , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( I = ' S ' , Z ) WHERE ( C ) ; ... </k>		
 		<table-name> SetItem(N) </table-name>
-		<schema> M:Map </schema>
+		<schema> O:Map </schema>
+		<numvalues> X:Int </numvalues>
 		<values> ...
-			
-			Bag
 
-		... </values> 
-/*
+			<value> 
+				<numvalue> L:Int </numvalue>
+				<val> M:Map => updateMapConditioned( M , I |-> S , C ) </val>	//recupera il valore data la chiave e lo aggiorna
+			</value>
 
-syntax Substitution ::=	Id "=" "null"
-					|	Id "=" Exp
-					|	Id "=" "'" String "'"
-					|	Id "=" "'" Int "'"
+		... </values>
+		<count> J:Int => J +Int 1 </count>
+		//solo quando ci sono ancora value e il tipo inserito è corretto e le condizioni sono verificate
+		when ( inc(J) ==Int L andBool J <=Int X andBool typeChecker( O , I , SMALLINT , "null" ) )
 
-syntax Substitutions ::=	List{Substitution,","}
+//se ha finito l'update complessa della prima sostituzione passa alle successive
+rule <k> UPDATE N:Id SET ( _ , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( Z ) WHERE ( C ) ; ... </k>	
+		<table-name> SetItem(N) </table-name>
+		<numvalues> L:Int </numvalues>
+		<count> J:Int => 0 </count>	//azzera il contatore
+		when ( inc(J) >Int L )	//solo quando non ci sono piu value
 
-syntax Condition ::=	Id "=" "'" String "'"
-					|	Id "=" "'" Int "'"
-					|	Id "=" Exp
-
-syntax Conditions ::=	Condition
-					|	Conditions AndOr Conditions
-
-syntax AndOr ::=	"AND"
-				|	"OR" 
-
-*/
+rule <k> UPDATE N:Id SET .Substitutions WHERE _; => .K ... </k>	
+		<count> J:Int => 0 </count>	//azzera il contatore
 
 // ------ FUNZIONI ------ //
 //inserisce i valori nella tupla (null se non viene specificato il valore per qualche attributo)
@@ -351,15 +348,28 @@ rule insertValues( .Columns , .Values , (X:Id |-> T:Type) M:Map) => X |-> null i
 rule insertValues( .Columns , .Values , .Map) => .Map
 
 //controlla che il tipo sia quello giusto nello schema della tabella
-syntax Bool ::= "typeCheck" "(" Map "," Id "," Type "," String ")"	[function]
-rule typeCheck( (X:Id |-> T:Type) M:Map , I:Id , S:Type , _ ) => #if ( (X ==K I) andBool (T ==K S) ) #then true #else typeCheck( M , I , S , "null") #fi
-rule typeCheck( (X:Id |-> T:Type) M:Map , I:Id , VARCHAR(_) , Z:String ) => #if ((X ==K I) andBool ((VARCHAR(charNumber( Z , T )) ==K T) orBool VARCHAR ==K T)) #then true #else typeCheck( M , I , VARCHAR(0) , Z ) #fi
-rule typeCheck( .Map , _ , _ , _) => false
+syntax Bool ::= "typeChecker" "(" Map "," Id "," Type "," String ")"	[function]
+rule typeChecker( (X:Id |-> T:Type) M:Map , I:Id , SMALLINT , _ ) => #if ( (X ==K I) andBool (T ==K SMALLINT) ) #then true #else typeChecker( M , I , SMALLINT , "null") #fi
+rule typeChecker( (X:Id |-> T:Type) M:Map , I:Id , VARCHAR(_) , Z:String ) => #if ((X ==K I) andBool ((VARCHAR(charNumber( Z , T )) ==K T) orBool VARCHAR ==K T)) #then true #else typeChecker( M , I , VARCHAR(100) , Z ) #fi
+rule typeChecker( .Map , _ , _ , _) => false
 
 //ritorna l'intero del campo del VARCHAR in questione se la stringa passata è entro tale intero
 syntax Int ::= "charNumber" "(" String "," Type ")"	[function]
-rule charNumber( S:String , VARCHAR ( I:Int )) => I
+rule charNumber( S:String , VARCHAR( I:Int )) => I
 		when ( I >=Int lengthString(S) )
+
+//aggiorna la mappa solo se sono soddisfatte le condizioni, altrimenti la lascia invariata
+syntax Map ::= "updateMapConditioned" "(" Map "," Map "," Conditions ")"	[function]
+rule updateMapConditioned( M:Map , O:Map , C:Conditions ) => #if (conditionChecker( M , C ) ==K true) #then updateMap( M , O ) #else M #fi
+
+//verifica le condizioni dell'update
+syntax Bool ::= "conditionChecker" "(" Map "," Conditions ")"	[function]
+rule conditionChecker( M:Map , C:Conditions AND G:Conditions ) => (conditionChecker( M , C) andBool conditionChecker( M , G))
+rule conditionChecker( M:Map , C:Conditions OR G:Conditions ) => #if (conditionChecker( M , C) ==K true) #then true #else (conditionChecker( M , G) ==K true) #fi
+rule conditionChecker( (X:Id |-> V:Int) M:Map , I:Id = ' S:Int ' ) => #if ( (X ==K I) andBool (V ==Int S) ) #then true #else conditionChecker( M , I = ' S ' ) #fi
+rule conditionChecker( (X:Id |-> ' V:String ' ) M:Map , I:Id = ' S:String ' ) => #if ( (X ==K I) andBool (V ==String S) ) #then true #else conditionChecker( M , I = ' S ' ) #fi
+rule conditionChecker( (X:Id |-> null) M:Map , I:Id = null ) => #if ( X ==K I ) #then true #else conditionChecker( M , I = null ) #fi
+rule conditionChecker( .Map , Conditions ) => false
 
 //controlla che la stringa inserita sia entro la lunghezza definita in CREATE TABLE
 syntax Bool ::= "charControl" "(" Map "," Columns "," Values ")"	[function]

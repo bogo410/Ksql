@@ -24,4 +24,4 @@ UPDATE numetabella SET nomecolonna = … WHERE nomecolonna = …
 
 
 // ---- PROBLEMI DEL FILE CORRENTE .K ---- //
-// non si riesce a ciclare sui bag.
+// verificare le condizioni dell’update
