@@ -11,6 +11,7 @@ syntax Stmt ::=	"CREATE DATABASE" Id ";"
 			|	"INSERT INTO" Id "(" Columns ")" "VALUES" "(" Values ")" ";"
 			|	"UPDATE" Id "SET" Substitutions ";"
 			|	"UPDATE" Id "SET" Substitutions "WHERE" Conditions ";"
+			|	"SELECT" "*" "FROM" Id ";"
 
 
 syntax Stmts ::= 	Stmt
@@ -114,24 +115,36 @@ module SQL
 
 	configuration 	<T color="yellow">
 						<k color="green"> $PGM:Stmts </k>
+
+						<outputs color="red"> 
+
+							<output multiplicity="*" color="cyan"> .Map </output>
+
+						</outputs>
+
 						<database color="orange">
 							<database-name color="blue"> .Set </database-name>
+
 							<tables color="LightSkyBlue">
 								<table multiplicity="*" color="red"> 
 									<table-name color="blue"> .Set </table-name>
 									<schema color="Orchid"> .Map </schema>
 									<key color="purple"> .Set </key>
 									<keyvalues> .Set </keyvalues>
-									<numvalues> #counter </numvalues>
+									<numvalues color="LightSkyBlue"> #counter </numvalues>
+
 									<values multiplicity="*" color="gray">
-										<value color="black"> 
-											<numvalue> #counter </numvalue>
-											<val> .Map </val> 
+										<value color="yellow"> 
+											<numvalue color="cyan"> #counter </numvalue>
+											<val color="purple"> .Map </val> 
 										</value>
 									</values>
+
 								</table>
 							</tables> 
+
 						</database>
+
 						<count> #counter </count>
 				  	</T>
 
@@ -241,13 +254,15 @@ rule <k> SAVE KEY N:Id ( C:Id , G:Columns ) VALUES ( V:Value , W:Values ) ; => S
 		<table-name> SetItem(N) </table-name>
 		<key> Z:Set </key>
 		<keyvalues> S:Set => S SetItem(V) </keyvalues>
-		when ( C in Z ) //solo quando C è chiave
+		//solo quando C è chiave
+		when ( C in Z )
 
 //se non è una primary key va avanti a controllare senza fare nulla
 rule <k> SAVE KEY N:Id ( C:Id , G:Columns ) VALUES ( V:Value , W:Values ) ; => SAVE KEY N ( G ) VALUES ( W ) ; ... </k>	
 		<table-name> SetItem(N) </table-name>
 		<key> Z:Set </key>
-		when notBool( C in Z ) //solo quando C non è chiave
+		//solo quando C non è chiave
+		when notBool( C in Z )
 
 rule <k> SAVE KEY N:Id ( .Columns ) VALUES ( .Values ) ; => .K ... </k>	
 
@@ -261,7 +276,8 @@ rule <k> UPDATE N:Id SET ( I:Id = ' S:Int ' , Z:Substitutions ) ; => UPDATE N SE
 
 			<value> 
 				<numvalue> L:Int </numvalue>
-				<val> M:Map => updateMap( M , I |-> S ) </val>	//recupera il valore data la chiave e lo aggiorna
+				//recupera il valore data la chiave e lo aggiorna
+				<val> M:Map => updateMap( M , I |-> S ) </val>
 			</value>
 
 		... </values>
@@ -278,7 +294,8 @@ rule <k> UPDATE N:Id SET ( I:Id = ' S:String ' , Z:Substitutions ) ; => UPDATE N
 
 			<value> 
 				<numvalue> L:Int </numvalue>
-				<val> M:Map => updateMap( M , I |-> ' S ' ) </val>	//recupera il valore data la chiave e lo aggiorna
+				//recupera il valore data la chiave e lo aggiorna
+				<val> M:Map => updateMap( M , I |-> ' S ' ) </val>	
 			</value>
 
 		... </values>
@@ -295,7 +312,8 @@ rule <k> UPDATE N:Id SET ( I:Id = null , Z:Substitutions ) ; => UPDATE N SET ( I
 
 			<value> 
 				<numvalue> L:Int </numvalue>
-				<val> M:Map => updateMap( M , I |-> null ) </val>	//recupera il valore data la chiave e lo aggiorna
+				//recupera il valore data la chiave e lo aggiorna
+				<val> M:Map => updateMap( M , I |-> null ) </val>
 			</value>
 
 		... </values>
@@ -307,11 +325,13 @@ rule <k> UPDATE N:Id SET ( I:Id = null , Z:Substitutions ) ; => UPDATE N SET ( I
 rule <k> UPDATE N:Id SET ( _ , Z:Substitutions ) ; => UPDATE N:Id SET ( Z ) ; ... </k>	
 		<table-name> SetItem(N) </table-name>
 		<numvalues> L:Int </numvalues>
-		<count> J:Int => 0 </count>	//azzera il contatore
-		when ( inc(J) >Int L )	//solo quando non ci sono piu value
+		//azzera il contatore
+		<count> J:Int => 0 </count>
+		//solo quando non ci sono piu value
+		when ( inc(J) >Int L )
 
 rule <k> UPDATE N:Id SET .Substitutions ; => .K ... </k>	
-		//<count> J:Int => 0 </count>	//azzera il contatore
+		<count> J:Int => 0 </count>	//azzera il contatore
 
 //update complessa per interi
 rule <k> UPDATE N:Id SET ( I:Id = ' S:Int ' , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( I = ' S ' , Z ) WHERE ( C ) ; ... </k>		
@@ -322,7 +342,8 @@ rule <k> UPDATE N:Id SET ( I:Id = ' S:Int ' , Z:Substitutions ) WHERE ( C:Condit
 
 			<value> 
 				<numvalue> L:Int </numvalue>
-				<val> M:Map => updateMapConditioned( M , I |-> S , C ) </val>	//recupera il valore data la chiave e lo aggiorna
+				//recupera il valore data la chiave e lo aggiorna
+				<val> M:Map => updateMapConditioned( M , I |-> S , C ) </val>
 			</value>
 
 		... </values>
@@ -330,15 +351,88 @@ rule <k> UPDATE N:Id SET ( I:Id = ' S:Int ' , Z:Substitutions ) WHERE ( C:Condit
 		//solo quando ci sono ancora value e il tipo inserito è corretto e le condizioni sono verificate
 		when ( inc(J) ==Int L andBool J <=Int X andBool typeChecker( O , I , SMALLINT , "null" ) )
 
+//update complessa per stringhe
+rule <k> UPDATE N:Id SET ( I:Id = ' S:String ' , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( I = ' S ' , Z ) WHERE ( C ) ; ... </k>		
+		<table-name> SetItem(N) </table-name>
+		<schema> O:Map </schema>
+		<numvalues> X:Int </numvalues>
+		<values> ...
+
+			<value> 
+				<numvalue> L:Int </numvalue>
+				//recupera il valore data la chiave e lo aggiorna
+				<val> M:Map => updateMapConditioned( M , I |-> ' S ' , C ) </val>
+			</value>
+
+		... </values>
+		<count> J:Int => J +Int 1 </count>
+		//solo quando ci sono ancora value e il tipo inserito è corretto e le condizioni sono verificate
+		when ( inc(J) ==Int L andBool J <=Int X andBool typeChecker( O , I , VARCHAR(100) , S ) )
+
+//update complessa per i valori nulli
+rule <k> UPDATE N:Id SET ( I:Id = null , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( I = null , Z ) WHERE ( C ) ; ... </k>		
+		<table-name> SetItem(N) </table-name>
+		<numvalues> X:Int </numvalues>
+		<values> ...
+
+			<value> 
+				<numvalue> L:Int </numvalue>
+				//recupera il valore data la chiave e lo aggiorna
+				<val> M:Map => updateMapConditioned( M , I |-> null , C ) </val>
+			</value>
+
+		... </values>
+		<count> J:Int => J +Int 1 </count>
+		//solo quando ci sono ancora value e il tipo inserito è corretto e le condizioni sono verificate
+		when ( inc(J) ==Int L andBool J <=Int X )
+
 //se ha finito l'update complessa della prima sostituzione passa alle successive
 rule <k> UPDATE N:Id SET ( _ , Z:Substitutions ) WHERE ( C:Conditions ) ; => UPDATE N:Id SET ( Z ) WHERE ( C ) ; ... </k>	
 		<table-name> SetItem(N) </table-name>
 		<numvalues> L:Int </numvalues>
-		<count> J:Int => 0 </count>	//azzera il contatore
-		when ( inc(J) >Int L )	//solo quando non ci sono piu value
+		//azzera il contatore
+		<count> J:Int => 0 </count>
+		//solo quando non ci sono piu value
+		when ( inc(J) >Int L )
 
 rule <k> UPDATE N:Id SET .Substitutions WHERE _; => .K ... </k>	
-		<count> J:Int => 0 </count>	//azzera il contatore
+		//azzera il contatore
+		<count> J:Int => 0 </count>
+
+// ------ SELECT ------- //
+//selct all
+rule <k> SELECT * FROM N:Id ; => SELECT * FROM N ; ... </k>
+		<table-name> SetItem(N) </table-name>
+		<numvalues> X:Int </numvalues>
+		<values> ...
+
+			<value> 
+				<numvalue> L:Int </numvalue>
+				//recupera la mappa
+				<val> M:Map </val>
+			</value>
+
+		... </values>
+		<count> J:Int => J +Int 1 </count>
+
+		<outputs> ...
+			//aggiungo la mappa all'output
+			( . => <output>
+				M
+			</output> )
+		... </outputs>
+
+		//solo quando ci sono ancora value
+		when ( inc(J) ==Int L andBool J <=Int X )
+
+//quando ha finito di aggiungere le mappe
+rule <k> SELECT * FROM _ ; => .K ... </k>	
+		<table-name> SetItem(N) </table-name>
+		<numvalues> L:Int </numvalues>
+		//azzera il contatore
+		<count> J:Int => 0 </count>
+		//solo quando non ci sono piu value
+		when ( inc(J) >Int L )
 
 // ------ FUNZIONI ------ //
 //inserisce i valori nella tupla (null se non viene specificato il valore per qualche attributo)
